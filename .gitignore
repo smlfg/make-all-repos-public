@@ -1,0 +1,4 @@
+data/private/
+gitleaks
+*.tar.zst
+__pycache__/
