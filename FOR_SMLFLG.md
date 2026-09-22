@@ -19,6 +19,8 @@ Entstanden in der Nacht 22./23.09.2026 aus einer einzigen Session. Samuel hat en
 5. **Metriken lassen sich austricksen:** durch Streichen oder durch Vagheit (86 Zeilen, 0 Pfade). Deshalb drei Achsen: Treue, Dichte, Abdeckung.
 6. **Selection Bias ist leicht gebaut.** Repos danach auszuwählen, dass GPT dort gut war, bevorzugt GPT. Auswahl vorher und unabhängig festlegen.
 8. **Nie ein Skript editieren, das gerade läuft.** Bash liest Skripte stückweise während der Ausführung; ein Umschreiben mittendrin zerbricht den laufenden Aufruf (`Dateiende beim Suchen nach »"«`). Fix: neue Version unter neuem Namen anlegen und per `mv` atomar ersetzen, oder warten. Hier gerettet, weil das JSON-Rohlog vollständig war: Rohdaten zuerst schreiben, Statistik danach ableiten.
+9. **"Fertig" gemeldet ist nicht geliefert.** 5 von 45 Läufen haben die README nie verändert, einer meldete `POLISH_DONE 0`. Eine Metrik, die das Ergebnis misst statt die Lieferung zu prüfen, bewertet dann das Original. Immer zuerst prüfen: Hat sich überhaupt etwas geändert?
+10. **Werkzeug-Versionen driften unter Skripten weg.** OpenCode v2 kennt `--dir` nicht mehr; `archify-swarm/fanout.sh` nutzt es noch. Die Probe hat es gefangen, weil sie nur Exit 0 *plus* echten Text zählt.
 7. **Harness-Grenzen sind unsichtbar, bis sie greifen.** Hermes-Schreib-Sandbox (`HERMES_WRITE_SAFE_ROOT`), OpenCode hängt still bei Dateien außerhalb des Projekts. Beides ist Sicherheit, kein Fehler.
 
 ## Offen / Nächste Schritte

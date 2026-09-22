@@ -77,7 +77,12 @@ def main():
         for f in glob.glob(E + f"/{r}-oc-*/README.md"):
             cand["oc:" + f.split("-oc-")[1].split("/")[0]] = f
         for arm, f in cand.items():
-            if not os.path.exists(f):
+            clone = os.path.dirname(f)
+            # Nicht geliefert: README fehlt oder ist im Clone unverändert. Sonst misst man das Original.
+            delivered = os.path.exists(f) and (
+                arm.startswith("gpt") or bool(os.popen(f"git -C '{clone}' status --porcelain -- README.md").read().strip()))
+            if not delivered:
+                rows.setdefault(arm, []).append(dict(failed=True))
                 continue
             t = open(f, errors="ignore").read()
             rs = refs(t)
@@ -85,18 +90,23 @@ def main():
             tools, dur = eff.get((arm, r), (None, None))
             rows.setdefault(arm, []).append(dict(ok=ok, n=len(rs), lines=max(t.count("\n"), 1),
                                                  sec=sections(t), tools=tools, dur=dur))
-    print("| Arm | n | Treue | Dichte | Abschnitte | Zeilen | Tool-Calls | Dauer |")
+    print("| Arm | geliefert | Treue | Dichte | Abschnitte | Zeilen | Tool-Calls | Dauer |")
     print("|---|---|---|---|---|---|---|---|")
     def treue(v):
         return sum(x["ok"] for x in v) / max(sum(x["n"] for x in v), 1)
-    for arm, v in sorted(rows.items(), key=lambda kv: -treue(kv[1])):
+    for arm, allv in sorted(rows.items(), key=lambda kv: -treue([x for x in kv[1] if not x.get("failed")])):
+        v = [x for x in allv if not x.get("failed")]
+        if not v:
+            print(f"| {arm} | 0/{len(allv)} | – | – | – | – | – | – |")
+            continue
+        n_label = f"{len(v)}/{len(allv)}"
         tl = [x["tools"] for x in v if x["tools"] is not None]
         dl = [x["dur"] for x in v if x["dur"] is not None]
-        print(f"| {arm} | {len(v)} | {100*treue(v):.0f} % "
+        print(f"| {arm} | {n_label} | {100*treue(v):.0f} % "
               f"| {10*sum(x['ok'] for x in v)/sum(x['lines'] for x in v):.1f} "
               f"| {st.mean(x['sec'] for x in v):.1f}/4 | {st.mean(x['lines'] for x in v):.0f} "
               f"| {st.mean(tl):.0f} | {st.mean(dl):.0f} s |" if tl and dl else
-              f"| {arm} | {len(v)} | {100*treue(v):.0f} % "
+              f"| {arm} | {n_label} | {100*treue(v):.0f} % "
               f"| {10*sum(x['ok'] for x in v)/sum(x['lines'] for x in v):.1f} "
               f"| {st.mean(x['sec'] for x in v):.1f}/4 | {st.mean(x['lines'] for x in v):.0f} | – | – |")
 
