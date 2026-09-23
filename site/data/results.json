@@ -250,6 +250,8 @@
      "verdict_note": "schöne semantische Gliederung, gute Struktur, Grenzen klar: \"würdiger Kandidat\"",
      "delivered": true,
      "fidelity": "94 % (16/17)",
+     "real_paths": "16/17",
+     "lines": "54",
      "readme": "readmes/blindtest-1/README_A.md"
     },
     {
@@ -260,6 +262,8 @@
      "verdict_note": "README nicht verändert, fällt raus",
      "delivered": false,
      "fidelity": "71 % (10/14)",
+     "real_paths": "10/14",
+     "lines": "30",
      "readme": "readmes/blindtest-1/README_B.md"
     },
     {
@@ -270,6 +274,8 @@
      "verdict_note": "Schnellstart klar, Struktur übersichtlich, Ablauf toll, Benchmarks integriert, aber wenig erklärt",
      "delivered": true,
      "fidelity": "67 % (12/18)",
+     "real_paths": "12/18",
+     "lines": "63",
      "readme": "readmes/blindtest-1/README_C.md"
     },
     {
@@ -280,6 +286,8 @@
      "verdict_note": "Abschnitt \"Herkunft\" sinnlos für öffentliches Repo; \"zuerst lesen\" nach Quickstart schwach; Benchmark unvollständig; aber besser aufgedröselt",
      "delivered": true,
      "fidelity": "100 % (16/16)",
+     "real_paths": "16/16",
+     "lines": "62",
      "readme": "readmes/blindtest-1/README_D.md"
     },
     {
@@ -290,6 +298,8 @@
      "verdict_note": "\"am besten gegliedert, erster Blickeindruck am besten\"; zwei Teile, Grenzen + Sichtbarkeit gut; Benchmark fehlt",
      "delivered": true,
      "fidelity": "94 % (16/17)",
+     "real_paths": "16/17",
+     "lines": "46",
      "readme": "readmes/blindtest-1/README_E.md"
     },
     {
@@ -300,6 +310,8 @@
      "verdict_note": "Modellname (Nemotron) im Titel, inhaltlich wohl okay, \"nicht bei all meinen Projekten\"",
      "delivered": true,
      "fidelity": "88 % (14/16)",
+     "real_paths": "14/16",
+     "lines": "51",
      "readme": "readmes/blindtest-1/README_F.md"
     },
     {
@@ -310,6 +322,8 @@
      "verdict_note": "Struktur schlecht, wirkt unfertig",
      "delivered": true,
      "fidelity": "94 % (15/16)",
+     "real_paths": "15/16",
+     "lines": "67",
      "readme": "readmes/blindtest-1/README_G.md"
     },
     {
@@ -320,6 +334,8 @@
      "verdict_note": "\"Struktur hier am allerbesten\"; Absatz \"Was gemacht wurde\"/Nebenkommentar sehr gut",
      "delivered": true,
      "fidelity": "100 % (16/16)",
+     "real_paths": "16/16",
+     "lines": "46",
      "readme": "readmes/blindtest-1/README_H.md"
     },
     {
@@ -330,6 +346,8 @@
      "verdict_note": "\"Benchmark in Kürze\" als Fließtext mit Findings = echter Mehrwert; Struktur gut, Grenzen sehr ausführlich",
      "delivered": true,
      "fidelity": "94 % (16/17)",
+     "real_paths": "16/17",
+     "lines": "57",
      "readme": "readmes/blindtest-1/README_I.md"
     }
    ]
