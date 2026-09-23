@@ -8,15 +8,21 @@
 <style>
 :root{
   --bg:#fcfcfb; --fg:#0b0b0b; --muted:#52514e; --line:#e8e7e3;
-  --a1:#2a78d6; --a2:#eb6834;
-  --card:#f6f5f2; --code:#f0efec;
+  --line-strong:#dedcd6;              /* Kartenrahmen, eine Stufe kraeftiger als die Haarlinie */
+  --a1:#2a78d6; --a2:#eb6834;         /* Blau = kostenlos/geprueft · Orange = Abo/Sieger */
+  --card:#f3f2ee; --code:#f0efec;
+  --bg-alt:#f4f3ef;
+  --ring:rgba(11,11,11,.05);
   --max:1080px;
 }
 @media (prefers-color-scheme:dark){
   :root{
     --bg:#1a1a19; --fg:#ffffff; --muted:#c3c2b7; --line:#383835;
+    --line-strong:#3f3f3b;
     --a1:#3987e5; --a2:#d95926;
-    --card:#222220; --code:#262624;
+    --card:#242422; --code:#262624;
+    --bg-alt:#1e1e1c;
+    --ring:rgba(0,0,0,.30);
   }
 }
 *{box-sizing:border-box}
@@ -36,12 +42,29 @@ a{color:inherit}
 
 section{padding:56px 0;border-top:1px solid var(--line)}
 section:first-of-type{border-top:0}
+/* Rhythmus: zwei getoente Baender statt Streifenmuster. Karten darin
+   werden auf --bg gesetzt, damit sie sich weiterhin abheben. */
+section.alt{background:var(--bg-alt);border-top-color:var(--line-strong)}
+section.alt .card,section.alt .gcard,section.alt .steps{background:var(--bg)}
+section.alt .card,section.alt .gcard{border-color:var(--line-strong)}
+
+/* ---------- Fortschrittsbalken ---------- */
+.progress{
+  position:sticky;top:0;height:2px;background:var(--line);z-index:20;
+}
+.progress i{
+  display:block;height:100%;background:var(--a1);
+  transform:scaleX(0);transform-origin:0 50%;
+}
 .eyebrow{
   font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
   color:var(--muted);margin:0 0 10px;font-weight:600;
 }
-h2{font-size:1.6rem;line-height:1.2;margin:0 0 8px;letter-spacing:-.01em}
-h3{font-size:1.02rem;line-height:1.35;margin:0 0 6px;letter-spacing:-.005em}
+/* Sektionsnummer: zaehlt mit, faerbt aber nie den Text */
+.eyebrow .idx{font-variant-numeric:tabular-nums;letter-spacing:.1em;margin-right:8px}
+.eyebrow .idx::after{content:" · ";letter-spacing:0}
+h2{font-size:1.85rem;line-height:1.2;margin:0 0 8px;letter-spacing:-.015em;text-wrap:balance}
+h3{font-size:1.12rem;line-height:1.35;margin:0 0 6px;letter-spacing:-.01em;text-wrap:balance}
 .lead{margin:0 0 28px;max-width:62ch;color:var(--muted);font-size:1.02rem}
 p{margin:0 0 14px;max-width:68ch}
 .small{font-size:.86rem;color:var(--muted)}
@@ -49,27 +72,43 @@ p{margin:0 0 14px;max-width:68ch}
 
 /* ---------- Hero ---------- */
 header{padding:72px 0 60px}
+.hero{display:grid;gap:32px;align-items:start}
+@media (min-width:1000px){.hero{grid-template-columns:1fr 296px;gap:56px}}
 .thesis{
   font-family:Georgia,"Iowan Old Style","Times New Roman",serif;
-  font-size:clamp(1.9rem,5.2vw,3.15rem);line-height:1.13;
-  letter-spacing:-.022em;margin:0 0 20px;max-width:19ch;
+  font-size:clamp(2.1rem,6vw,3.6rem);line-height:1.12;
+  letter-spacing:-.024em;margin:0 0 20px;max-width:19ch;
   text-wrap:balance;
 }
 .thesis .arrow{color:var(--muted);font-style:normal}
 .sub{max-width:56ch;color:var(--muted);font-size:1.08rem;margin:0 0 38px}
-.stats{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;grid-template-columns:1fr}
+/* Ruhiges Raster-Motiv im Hero: Praesenz ohne ein einziges neues Wort.
+   Die Maske sitzt auf dem Pseudo-Element, damit sie nur das Raster trifft
+   und niemals den Text darüber. */
+.hero{position:relative;margin:0 -16px;padding:0 16px 8px}
+.hero::before{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background-image:radial-gradient(var(--line-strong) 1px,transparent 1px);
+  background-size:22px 22px;background-position:0 -11px;
+  -webkit-mask-image:linear-gradient(105deg,#000 0%,rgba(0,0,0,.35) 46%,transparent 72%);
+  mask-image:linear-gradient(105deg,#000 0%,rgba(0,0,0,.35) 46%,transparent 72%);
+}
+@media (min-width:900px){
+  .hero{margin:0 -24px;padding:0 24px 8px}
+  .hero::before{background-size:26px 26px}
+}
+
+.stats{display:grid;gap:1px;background:var(--line);border:1px solid var(--line-strong);border-radius:12px;overflow:hidden;grid-template-columns:1fr;margin-top:34px}
 @media (min-width:760px){.stats{grid-template-columns:repeat(3,1fr)}}
-.stat{background:var(--bg);padding:22px 24px 24px}
-.stat::before{content:"";display:block;width:26px;height:2px;background:var(--a1);margin-bottom:16px}
-.stat:nth-child(2)::before{background:var(--a2)}
-.stat:nth-child(3)::before{background:var(--a1)}
+.stat{background:var(--bg);padding:22px 24px 24px;border-left:3px solid var(--a1)}
+.stat:nth-child(2){border-left-color:var(--a2)}
 .stat .n{
-  display:block;font-size:1.72rem;font-weight:600;letter-spacing:-.02em;
-  line-height:1.15;margin-bottom:2px;
+  display:block;font-size:2.3rem;font-weight:600;letter-spacing:-.03em;
+  line-height:1.1;margin-bottom:2px;font-variant-numeric:tabular-nums;
 }
 .stat .n .arrow{color:var(--muted);font-weight:400}
-.stat .n .name{font-size:1.02rem;font-weight:500;letter-spacing:-.01em}
-.stat .cap{display:block;font-size:.85rem;color:var(--muted);margin-top:8px;line-height:1.45}
+.stat .n .name{font-size:1.24rem;font-weight:600;letter-spacing:-.02em}
+.stat .cap{display:block;font-size:.85rem;color:var(--muted);margin-top:10px;line-height:1.45}
 
 /* ---------- Textgitter ---------- */
 .two{display:grid;gap:34px;align-items:start}
@@ -79,15 +118,17 @@ header{padding:72px 0 60px}
 .cards{display:grid;gap:16px;grid-template-columns:1fr}
 @media (min-width:680px){.cards{grid-template-columns:1fr 1fr}}
 @media (min-width:1020px){.cards.four{grid-template-columns:repeat(4,1fr)}}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 20px 22px}
+.card{background:var(--card);border:1px solid var(--line-strong);border-radius:12px;padding:20px 20px 22px;box-shadow:0 1px 2px var(--ring)}
 .card .num{
   display:block;font-size:.78rem;color:var(--muted);font-weight:600;
-  letter-spacing:.1em;margin-bottom:10px;
+  letter-spacing:.1em;margin-bottom:10px;font-variant-numeric:tabular-nums;
 }
 .card p{font-size:.94rem;margin:0 0 12px;max-width:none}
+/* Grosse Kennzahl als Anker der Lektionskarte */
 .card .fig{
-  display:block;font-size:1.3rem;font-weight:600;letter-spacing:-.015em;
-  padding-top:12px;margin-top:14px;border-top:1px solid var(--line);
+  display:block;font-size:1.9rem;font-weight:600;letter-spacing:-.03em;
+  padding-top:14px;margin-top:14px;border-top:1px solid var(--line);
+  font-variant-numeric:tabular-nums;line-height:1.1;
 }
 .card .fig .arrow{color:var(--muted);font-weight:400}
 
@@ -105,19 +146,33 @@ header{padding:72px 0 60px}
 .chart{width:100%;height:auto;display:block;max-width:560px;margin:0 auto}
 
 /* ---------- Tabelle ---------- */
-.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin:26px 0 0}
+.tablewrap{overflow-x:auto;border:1px solid var(--line-strong);border-radius:12px;margin:26px 0 0}
 table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:620px}
 caption{caption-side:top;text-align:left;padding:16px 18px 0;font-size:.86rem;color:var(--muted)}
 th,td{padding:9px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
-thead th{font-size:.74rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600;white-space:nowrap}
+thead th{
+  font-size:.74rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);
+  font-weight:600;white-space:nowrap;
+  position:sticky;top:0;background:var(--bg);z-index:1;
+  box-shadow:inset 0 -1px 0 var(--line);
+}
 tbody tr:last-child td{border-bottom:0}
 tbody th{font-weight:500}
 td.n{white-space:nowrap;font-variant-numeric:tabular-nums}
 tr.dim td,tr.dim th{color:var(--muted)}
+/* Siegerzeile: Akzent als Information, nicht als Dekoration.
+   Nur die linke Kante, nicht jede Zelle. */
+tr.top > *:first-child{box-shadow:inset 3px 0 0 var(--a2)}
+tbody tr:hover td,tbody tr:hover th{background:var(--card)}
 .foot{margin:12px 0 0;font-size:.82rem;color:var(--muted);max-width:70ch}
 
 /* ---------- Galerie ---------- */
-.gal-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 22px}
+.gal-bar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between;margin:0 0 22px}
+.counter{
+  margin:0 0 0 auto;font-size:.8rem;color:var(--muted);
+  font-variant-numeric:tabular-nums;letter-spacing:.04em;white-space:nowrap;
+}
+.counter b{color:var(--fg);font-weight:600}
 .tabs{display:flex;gap:6px;flex-wrap:wrap}
 .tab{
   font:inherit;font-size:.86rem;line-height:1.2;padding:9px 15px;cursor:pointer;
@@ -137,8 +192,9 @@ tr.dim td,tr.dim th{color:var(--muted)}
 .track::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
 .gcard{
   flex:0 0 auto;width:min(82vw,300px);scroll-snap-align:center;
-  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  background:var(--card);border:1px solid var(--line-strong);border-radius:14px;
   padding:20px;display:flex;flex-direction:column;min-height:262px;
+  box-shadow:0 1px 2px var(--ring);
 }
 .gcard .letter{
   font-size:3.1rem;font-weight:600;line-height:1;letter-spacing:-.04em;margin:0 0 4px;
@@ -153,15 +209,27 @@ tr.dim td,tr.dim th{color:var(--muted)}
 }
 .btn:hover{border-color:var(--a1)}
 .btn.primary{border-color:var(--a1);box-shadow:inset 0 0 0 1px var(--a1)}
-.gcard .rev{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);display:none}
-.gcard.open .rev{display:block}
+/* Reveal klappt auf, statt hart umzuschalten: 0fr -> 1fr klappt die
+   Zeilenhoehe, ohne die Seite springen zu lassen. */
+.gcard .rev{display:block;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.revbody{display:grid;grid-template-rows:0fr;opacity:0}
+.revbody>.revinner{overflow:hidden;min-height:0}
+.gcard.open .revbody{grid-template-rows:1fr;opacity:1}
+@media (prefers-reduced-motion:no-preference){
+  .revbody{transition:grid-template-rows .18s ease,opacity .18s ease}
+}
 .gcard .model{font-size:1.05rem;font-weight:600;letter-spacing:-.01em;word-break:break-word}
 .tags{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 14px}
+/* Kostenlos/Abo als Punkt wie in den Diagrammen. Text bleibt neutral,
+   damit die Legende der Diagramme nicht mit Textfarbe konkurriert. */
 .tag{
   font-size:.7rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);
   border:1px solid var(--line);border-radius:999px;padding:3px 9px;
+  display:inline-flex;align-items:center;gap:6px;
 }
-.tag.paid{color:var(--a2);border-color:var(--a2)}
+.kdot{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+.kdot.free{background:var(--a1)}
+.kdot.paid{background:var(--a2)}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:3px 14px;font-size:.84rem;margin:0 0 14px}
 .kv dt{color:var(--muted)}
 .kv dd{margin:0;font-variant-numeric:tabular-nums}
@@ -178,10 +246,25 @@ tr.dim td,tr.dim th{color:var(--muted)}
 .nav{display:flex;gap:8px;justify-content:center;margin:0 0 10px}
 .nav .btn{padding:7px 14px}
 
+/* ---------- Tooltip an den Datenpunkten ----------
+   Kein statischer Text: erscheint nur beim Ueberfahren eines Punktes. */
+.chart circle[data-m]{cursor:crosshair}
+#tip{
+  position:fixed;z-index:40;pointer-events:none;opacity:0;
+  transform:translateY(3px);
+  background:var(--fg);color:var(--bg);
+  border-radius:8px;padding:8px 11px;font-size:.78rem;line-height:1.45;
+  max-width:230px;box-shadow:0 4px 16px rgba(0,0,0,.22);
+  font-variant-numeric:tabular-nums;
+}
+#tip.on{opacity:1;transform:translateY(0)}
+#tip .tm{display:block;font-weight:600}
+#tip .tv{opacity:.72}
+
 /* ---------- Pipeline ---------- */
-.steps{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;grid-template-columns:1fr}
+.steps{display:grid;gap:1px;background:var(--line-strong);border:1px solid var(--line-strong);border-radius:12px;overflow:hidden;grid-template-columns:1fr}
 @media (min-width:760px){.steps{grid-template-columns:1fr 1fr 1fr}}
-.step{background:var(--bg);padding:20px 22px 22px}
+.step{background:var(--card);padding:20px 22px 22px}
 .step .k{
   display:block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
   color:var(--muted);font-weight:600;margin-bottom:10px;
@@ -202,23 +285,52 @@ footer{padding:44px 0 64px;border-top:1px solid var(--line);font-size:.88rem;col
 .links a:hover{border-color:var(--a1)}
 .flabel{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600}
 
+/* ---------- Mikro-Interaktionen ---------- */
+/* Nur transform/opacity/farbe, nur wenn die Person Bewegung erlaubt hat.
+   Kein Layout-Shift, keine dekorative Animation. */
+@media (prefers-reduced-motion:no-preference){
+  .btn,.tab,.dot,.card,.gcard{transition:transform .16s ease,border-color .16s ease,background-color .16s ease,color .16s ease}
+  .btn:hover{transform:translateY(-1px)}
+  .card:hover{transform:translateY(-1px)}
+  .dot[aria-current="true"]{transform:scale(1.25)}
+  #tip{transition:opacity .13s ease,transform .13s ease}
+
+  /* Einblenden beim Scrollen: Startzustand nur mit .js-motion, damit ohne
+     JavaScript nichts verborgen bleibt. */
+  .js-motion .reveal{opacity:0;transform:translateY(10px);
+    transition:opacity .34s ease,transform .34s ease}
+  .js-motion .reveal.in{opacity:1;transform:none}
+
+  .tab::after{
+    content:"";display:block;height:2px;margin:7px -4px -5px;border-radius:2px;
+    background:var(--a1);transform:scaleX(0);transform-origin:50% 50%;
+    transition:transform .16s ease;
+  }
+  .tab[aria-selected="true"]::after{transform:scaleX(1)}
+}
 @media (prefers-reduced-motion:reduce){
   *{scroll-behavior:auto !important}
+  .btn:hover,.card:hover{transform:none}
 }
 </style>
 </head>
 <body>
 <a class="skip" href="#inhalt">Zum Inhalt springen</a>
+<div class="progress" aria-hidden="true"><i id="bar"></i></div>
 
 <!-- ============ 1. HERO ============ -->
 <header>
   <div class="wrap">
-    <p class="eyebrow">Benchmark vom 23.09.2026 · OpenCode</p>
-    <h1 class="thesis">Mit Dateiliste und Prüfer schreibt ein kostenloses Modell die besten READMEs.</h1>
-    <p class="sub">
-      Zwei Repos, acht Modelle, eine Harness: dieselbe README-Aufgabe, dieselben Regeln.
-      Was wir wissen wollten — wie ehrlich schreibt ein KI-Agent über Code, den er nicht geschrieben hat?
-    </p>
+    <div class="hero">
+      <div>
+        <p class="eyebrow">Benchmark vom 23.09.2026 · OpenCode</p>
+        <h1 class="thesis">Mit Dateiliste und Prüfer schreibt ein kostenloses Modell die besten READMEs.</h1>
+        <p class="sub">
+          Zwei Repos, acht Modelle, eine Harness: dieselbe README-Aufgabe, dieselben Regeln.
+          Was wir wissen wollten — wie ehrlich schreibt ein KI-Agent über Code, den er nicht geschrieben hat?
+        </p>
+      </div>
+    </div>
     <div class="stats">
       <div class="stat">
         <span class="n"><span class="arrow">→</span> 100 %</span>
@@ -241,7 +353,7 @@ footer{padding:44px 0 64px;border-top:1px solid var(--line);font-size:.88rem;col
 <!-- ============ 2. DIE FRAGE & DER AUFBAU ============ -->
 <section>
   <div class="wrap">
-    <p class="eyebrow">Die Frage</p>
+    <p class="eyebrow"><span class="idx">01</span>Die Frage</p>
     <h2>Zwei Messungen, weil eine nicht reicht</h2>
     <p class="lead">
       Maschinell lässt sich fragen: <em>existieren die Pfade, die das Modell in Backticks nennt?</em>
@@ -320,7 +432,7 @@ footer{padding:44px 0 64px;border-top:1px solid var(--line);font-size:.88rem;col
 <!-- ============ 3. HAUPTERGEBNIS BENCHMARK 2 ============ -->
 <section>
   <div class="wrap">
-    <p class="eyebrow">Hauptergebnis · Benchmark 2</p>
+    <p class="eyebrow"><span class="idx">02</span>Hauptergebnis · Benchmark 2</p>
     <h2>Höchste Treue ist nicht automatisch das beste Urteil</h2>
     <p class="lead">
       Zwei Repos, acht Modelle, eine Harness. Waagerecht die gemessene Pfad-Treue, senkrecht das blinde
@@ -334,6 +446,7 @@ footer{padding:44px 0 64px;border-top:1px solid var(--line);font-size:.88rem;col
         <h3>hai-mcp: 100 % Treue, Urteil „gut“</h3>
         <svg class="chart" viewBox="0 0 560 370" role="img" aria-label="Streudiagramm hai-mcp: gpt-5.5 erreicht 100 Prozent Pfad-Treue und wird als gut bewertet. muse-spark-1.3 erreicht 80 Prozent und wird als Spitze bewertet. muse-spark-1.2 liegt bei 82 Prozent, Urteil Spitze. mimo-v2.6 bei 83 Prozent, Urteil schwach. nemotron-3-ultra bei 85 Prozent, Urteil schwach. deepseek-v4.1-flash bei 81 Prozent, Urteil Spitze. ling-3.0 bei 79 Prozent, Urteil gut.">
           <g font-family="system-ui,-apple-system,Segoe UI,sans-serif" font-size="11" fill="var(--muted)">
+            <rect x="60" y="38" width="450" height="36" fill="var(--a2)" opacity=".05"/>
             <line x1="60" y1="56" x2="510" y2="56" stroke="var(--line)" stroke-width="1"/>
             <line x1="60" y1="138" x2="510" y2="138" stroke="var(--line)" stroke-width="1"/>
             <line x1="60" y1="220" x2="510" y2="220" stroke="var(--line)" stroke-width="1"/>
@@ -360,16 +473,18 @@ footer{padding:44px 0 64px;border-top:1px solid var(--line);font-size:.88rem;col
             <text x="462" y="38">Abo</text>
           </g>
 
-          <!-- Punkte -->
+          <!-- Punkte. data-* tragen dieselben Werte wie die Beschriftung daneben. -->
           <g stroke="var(--bg)" stroke-width="1.5">
-            <circle cx="260" cy="56" r="5.5" fill="var(--a1)"/>
-            <circle cx="270" cy="56" r="5.5" fill="var(--a2)"/>
-            <circle cx="280" cy="56" r="5.5" fill="var(--a1)"/>
-            <circle cx="460" cy="138" r="5.5" fill="var(--a2)"/>
-            <circle cx="250" cy="138" r="5.5" fill="var(--a1)"/>
-            <circle cx="310" cy="302" r="5.5" fill="var(--a1)"/>
-            <circle cx="290" cy="302" r="5.5" fill="var(--a1)"/>
+            <circle cx="260" cy="56" r="6.5" fill="var(--a1)" data-m="muse-spark-1.3" data-f="80 %" data-v="Spitze"/>
+            <circle cx="270" cy="56" r="6.5" fill="var(--a2)" data-m="deepseek-v4.1-flash" data-f="81 %" data-v="Spitze"/>
+            <circle cx="280" cy="56" r="6.5" fill="var(--a1)" data-m="muse-spark-1.2" data-f="82 %" data-v="Spitze" data-w="1"/>
+            <circle cx="460" cy="138" r="6.5" fill="var(--a2)" data-m="gpt-5.5" data-f="100 %" data-v="gut"/>
+            <circle cx="250" cy="138" r="6.5" fill="var(--a1)" data-m="ling-3.0" data-f="79 %" data-v="gut"/>
+            <circle cx="310" cy="302" r="6.5" fill="var(--a1)" data-m="nemotron-3-ultra" data-f="85 %" data-v="schwach"/>
+            <circle cx="290" cy="302" r="6.5" fill="var(--a1)" data-m="mimo-v2.6" data-f="83 %" data-v="schwach"/>
           </g>
+          <!-- Siegerring: muse-spark-1.2 -->
+          <circle cx="280" cy="56" r="10" fill="none" stroke="var(--a2)" stroke-width="1.5" opacity=".55"/>
 
           <!-- Beschriftungen, kollisionsfrei versetzt -->
           <g font-family="system-ui,-apple-system,Segoe UI,sans-serif" font-size="11" fill="var(--fg)">
@@ -393,6 +508,7 @@ footer{padding:44px 0 64px;border-top:1px solid var(--line);font-size:.88rem;col
         <h3>sidecar-ng: 100 % Treue, Urteil von „mittel“ bis „Spitze“</h3>
         <svg class="chart" viewBox="0 0 560 370" role="img" aria-label="Streudiagramm sidecar-ng: muse-spark-1.2 erreicht 100 Prozent Pfad-Treue und wird als Spitze bewertet. Vier Modelle liegen ebenfalls bei 100 Prozent mit Urteil gut: muse-spark-1.3, gpt-5.5, mimo-v2.6 und deepseek. nemotron-3.5 liegt bei 100 Prozent mit Urteil mittel. ling-3.0 bei 73 Prozent mit Urteil schwach. nemotron-3-ultra bei 67 Prozent mit Urteil mittel.">
           <g font-family="system-ui,-apple-system,Segoe UI,sans-serif" font-size="11" fill="var(--muted)">
+            <rect x="60" y="38" width="450" height="36" fill="var(--a2)" opacity=".05"/>
             <line x1="60" y1="56" x2="510" y2="56" stroke="var(--line)" stroke-width="1"/>
             <line x1="60" y1="138" x2="510" y2="138" stroke="var(--line)" stroke-width="1"/>
             <line x1="60" y1="220" x2="510" y2="220" stroke="var(--line)" stroke-width="1"/>
@@ -419,14 +535,17 @@ footer{padding:44px 0 64px;border-top:1px solid var(--line);font-size:.88rem;col
             <text x="462" y="38">Abo</text>
           </g>
 
-          <!-- Punkte -->
+          <!-- Punkte. Der Punkt bei 100 %/gut traegt vier Modelle. -->
           <g stroke="var(--bg)" stroke-width="1.5">
-            <circle cx="460" cy="56" r="5.5" fill="var(--a1)"/>
-            <circle cx="460" cy="138" r="5.5" fill="var(--a1)"/>
-            <circle cx="460" cy="220" r="5.5" fill="var(--a1)"/>
-            <circle cx="130" cy="220" r="5.5" fill="var(--a1)"/>
-            <circle cx="190" cy="302" r="5.5" fill="var(--a1)"/>
+            <circle cx="460" cy="56" r="6.5" fill="var(--a1)" data-m="muse-spark-1.2" data-f="100 %" data-v="Spitze" data-w="1"/>
+            <circle cx="460" cy="138" r="6.5" fill="var(--a1)"
+                    data-m="muse-spark-1.3 · deepseek · mimo-v2.6 · gpt-5.5" data-f="100 %" data-v="gut" data-tie="1"/>
+            <circle cx="460" cy="220" r="6.5" fill="var(--a1)" data-m="nemotron-3.5" data-f="100 %" data-v="mittel"/>
+            <circle cx="130" cy="220" r="6.5" fill="var(--a1)" data-m="nemotron-3-ultra" data-f="67 %" data-v="mittel"/>
+            <circle cx="190" cy="302" r="6.5" fill="var(--a1)" data-m="ling-3.0" data-f="73 %" data-v="schwach"/>
           </g>
+          <!-- Siegerring: muse-spark-1.2 -->
+          <circle cx="460" cy="56" r="10" fill="none" stroke="var(--a2)" stroke-width="1.5" opacity=".55"/>
           <!-- Vier Modelle exakt übereinander: eine senkrechte Key-Achse statt vier Linien -->
           <g stroke="var(--muted)" stroke-width="1" fill="none">
             <line x1="460" y1="138" x2="452" y2="138"/>
@@ -469,7 +588,7 @@ footer{padding:44px 0 64px;border-top:1px solid var(--line);font-size:.88rem;col
           </tr>
         </thead>
         <tbody>
-          <tr><th scope="row">muse-spark-1.2 <span class="small">(free)</span></th><td class="n">Spitze / 82 % / 379</td><td class="n">Spitze / 100 % / 157</td><td class="n">0 $</td></tr>
+          <tr class="top"><th scope="row">muse-spark-1.2 <span class="small">(free)</span></th><td class="n">Spitze / 82 % / 379</td><td class="n">Spitze / 100 % / 157</td><td class="n">0 $</td></tr>
           <tr><th scope="row">deepseek-v4.1-flash</th><td class="n">Spitze* / 81 % / 366</td><td class="n">gut / 100 % / 131</td><td class="n">OpenCode-Go-Abo</td></tr>
           <tr><th scope="row">muse-spark-1.3 <span class="small">(free)</span></th><td class="n">Spitze / 80 % / 348</td><td class="n">gut / 100 % / 72</td><td class="n">0 $</td></tr>
           <tr><th scope="row">gpt-5.5</th><td class="n">gut / 100 % / 81</td><td class="n">gut / 100 % / 60</td><td class="n">Codex-Abo</td></tr>
@@ -490,9 +609,9 @@ footer{padding:44px 0 64px;border-top:1px solid var(--line);font-size:.88rem;col
 </section>
 
 <!-- ============ 3b. BLIND-GALERIE ============ -->
-<section>
+<section class="alt">
   <div class="wrap">
-    <p class="eyebrow">Blind-Galerie</p>
+    <p class="eyebrow"><span class="idx">03</span>Blind-Galerie</p>
     <h2>Swipe durch die READMEs, dann aufdecken</h2>
     <p class="lead">
       Jede Karte ist genau das, was der Bewerter zuerst sah: ein Buchstabe. Wischen, blättern oder die
@@ -505,6 +624,7 @@ footer{padding:44px 0 64px;border-top:1px solid var(--line);font-size:.88rem;col
         <button class="tab" role="tab" data-round="1" aria-selected="false">hai-mcp · 8 Karten</button>
         <button class="tab" role="tab" data-round="2" aria-selected="false">sidecar-ng · 8 Karten</button>
       </div>
+      <p class="counter" id="galCount" role="status" aria-live="polite"></p>
     </div>
     <p class="gal-hint" id="galHint"></p>
 
@@ -519,9 +639,9 @@ footer{padding:44px 0 64px;border-top:1px solid var(--line);font-size:.88rem;col
 </section>
 
 <!-- ============ 4. VIER LektionEN ============ -->
-<section>
+<section class="alt">
   <div class="wrap">
-    <p class="eyebrow">Vier Lektionen</p>
+    <p class="eyebrow"><span class="idx">04</span>Vier Lektionen</p>
     <h2>Was davon bleibt, wenn man die Zahlen wegnimmt</h2>
 
     <div class="cards four">
@@ -573,7 +693,7 @@ footer{padding:44px 0 64px;border-top:1px solid var(--line);font-size:.88rem;col
 <!-- ============ 5. EMPFOHLENE PIPELINE ============ -->
 <section>
   <div class="wrap">
-    <p class="eyebrow">Empfehlung</p>
+    <p class="eyebrow"><span class="idx">05</span>Empfehlung</p>
     <h2>Was ich daraus bauen würde</h2>
     <p class="lead">
       Der teuerste und der stärkste Weg fällt hier zusammen: das beste Modell im Test war kostenlos, und der
@@ -602,7 +722,7 @@ footer{padding:44px 0 64px;border-top:1px solid var(--line);font-size:.88rem;col
 <!-- ============ 6. EHRLICHE GRENZEN ============ -->
 <section>
   <div class="wrap">
-    <p class="eyebrow">Ehrliche Grenzen</p>
+    <p class="eyebrow"><span class="idx">06</span>Ehrliche Grenzen</p>
     <h2>Wofür diese Zahlen nicht reichen</h2>
     <ul class="limits">
       <li><b>n = 2 Repos, 1 Bewerter.</b> Eine Tendenz, kein Gesetz. Ein drittes Repo kann die Reihenfolge ändern.</li>
@@ -717,8 +837,14 @@ var ROUNDS = [
 var track = document.getElementById('track');
 var dots  = document.getElementById('dots');
 var hint  = document.getElementById('galHint');
+var countEl = document.getElementById('galCount');
 var tabs  = Array.prototype.slice.call(document.querySelectorAll('.tab'));
 var current = 0;
+
+function updateCount(){
+  var offen = track.querySelectorAll('.gcard.open').length;
+  countEl.innerHTML = '<b>' + offen + '</b> von ' + ROUNDS[current].cards.length + ' aufgedeckt';
+}
 
 function esc(s){
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -744,12 +870,14 @@ function cardHtml(c){
     +   delivered
     +   '<div class="acts">'+open+'<button class="btn primary" type="button">Aufdecken</button></div>'
     +   '<div class="rev">'
-    +     '<p class="model">'+esc(c.model)+'</p>'
-    +     '<p class="tags"><span class="tag">'+esc(c.provider)+'</span>'
-    +       '<span class="tag'+(c.paid?' paid':'')+'">'+(c.paid?'Abo':'kostenlos')+'</span>'
-    +       '<span class="tag">Urteil: <span class="stufe">'+esc(c.stufe||'—')+'</span></span></p>'
-    +     '<dl class="kv">'+rows+'</dl>'
-    +     '<blockquote class="blockquote">'+esc(c.quote)+'</blockquote>'
+    +     '<div class="revbody"><div class="revinner">'  /* alles Identifizierende erst nach "Aufdecken" */
+    +       '<p class="model">'+esc(c.model)+'</p>'
+    +       '<p class="tags"><span class="tag">'+esc(c.provider)+'</span>'
+    +         '<span class="tag"><i class="kdot '+(c.paid?'paid':'free')+'"></i>'+(c.paid?'Abo':'kostenlos')+'</span>'
+    +         '<span class="tag">Urteil: <span class="stufe">'+esc(c.stufe||'—')+'</span></span></p>'
+    +       '<dl class="kv">'+rows+'</dl>'
+    +       '<blockquote class="blockquote">'+esc(c.quote)+'</blockquote>'
+    +     '</div></div>'
     +   '</div>'
     + '</article>';
 }
@@ -765,6 +893,7 @@ function render(i){
   tabs.forEach(function(t,k){ t.setAttribute('aria-selected', k===i ? 'true':'false'); });
   track.scrollLeft = 0;
   updateDot();
+  updateCount();
 }
 
 function step(){
@@ -819,6 +948,7 @@ track.addEventListener('click', function(e){
   var card = b.closest('.gcard');
   card.classList.toggle('open');
   b.textContent = card.classList.contains('open') ? 'Wieder zuklappen' : 'Aufdecken';
+  updateCount();
 });
 track.addEventListener('keydown', function(e){
   if (e.key === 'ArrowRight'){ e.preventDefault(); go(1); }
@@ -843,6 +973,98 @@ function endDrag(){ down = false; lastDragEnd = Date.now(); track.classList.remo
 track.addEventListener('pointerup', endDrag);
 track.addEventListener('pointercancel', endDrag);
 track.addEventListener('pointerleave', endDrag);
+
+/* ---------- Fortschrittsbalken ----------
+   Ein 2-px-Balken, der die Leseposition zeigt. Kein Layout-Shift, kein Text. */
+var bar = document.getElementById('bar');
+var ticking = false;
+function progress(){
+  var h = document.documentElement.scrollHeight - window.innerHeight;
+  bar.style.transform = 'scaleX(' + (h > 0 ? Math.min(1, Math.max(0, window.scrollY / h)) : 0) + ')';
+  ticking = false;
+}
+window.addEventListener('scroll', function(){
+  if (!ticking){ ticking = true; requestAnimationFrame(progress); }
+}, {passive:true});
+window.addEventListener('resize', function(){
+  if (!ticking){ ticking = true; requestAnimationFrame(progress); }
+}, {passive:true});
+
+/* ---------- Zahlen einmal hochzaehlen ----------
+   Der Endwert steht im HTML. Ohne JavaScript bleibt er unveraendert. */
+function countUp(){
+  document.querySelectorAll('.stat .n').forEach(function(el){
+    var txt = el.textContent;
+    var m = txt.match(/(\d+)/);
+    if (!m) return;                       // z. B. der Modellname, keine Zahl
+    var ziel = parseInt(m[1], 10);
+    if (!ziel) return;                    // "0 erfundene Pfade" waere sinnlos hochzuzaehlen
+    var start = performance.now(), dauer = 620;
+    (function tick(now){
+      var t = Math.min(1, (now - start) / dauer);
+      var e = 1 - Math.pow(1 - t, 3);
+      el.textContent = txt.replace(m[1], String(Math.round(ziel * e)));
+      if (t < 1) requestAnimationFrame(tick);
+      else el.textContent = txt;          // exakt den Originalwert zuruecksetzen
+    })(start);
+  });
+}
+progress();
+
+/* ---------- Tooltips ---------- */
+var tip = document.createElement('div');
+tip.id = 'tip';
+tip.setAttribute('role', 'presentation');
+document.body.appendChild(tip);
+function showTip(el, x, y){
+  var m = el.getAttribute('data-m'), f = el.getAttribute('data-f'), v = el.getAttribute('data-v');
+  var zusatz = el.getAttribute('data-tie') ? ' · 4 Modelle' : '';
+  var sieg = el.getAttribute('data-w') ? ' · Sieger' : '';
+  tip.innerHTML = '<span class="tm">' + esc(m) + zusatz + sieg + '</span>'
+                + '<span class="tv">' + esc(f) + ' Pfad-Treue · Urteil ' + esc(v) + '</span>';
+  tip.classList.add('on');
+  var b = tip.getBoundingClientRect();
+  var links = x + 14 + b.width > window.innerWidth;
+  tip.style.left = (links ? x - b.width - 12 : x + 14) + 'px';
+  tip.style.top  = Math.max(8, Math.min(y - b.height / 2, window.innerHeight - b.height - 8)) + 'px';
+}
+function hideTip(){ tip.classList.remove('on'); }
+document.querySelectorAll('.chart circle[data-m]').forEach(function(c){
+  c.addEventListener('pointerenter', function(e){ showTip(c, e.clientX, e.clientY); });
+  c.addEventListener('pointermove', function(e){ if (tip.classList.contains('on')) showTip(c, e.clientX, e.clientY); });
+  c.addEventListener('pointerleave', hideTip);
+});
+document.addEventListener('scroll', hideTip, {passive:true});
+
+/* ---------- Einblenden beim Scrollen ----------
+   Die Startzustande stehen ausschliesslich unter .js-motion. Ohne JavaScript
+   bleibt alles sichtbar. */
+if (!prefersReduced()) {
+  document.documentElement.classList.add('js-motion');
+  document.querySelectorAll('.card, .step, .tablewrap, .figs, .limits').forEach(function(el){
+    el.classList.add('reveal');
+  });
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+    });
+  }, {rootMargin:'0px 0px -8% 0px', threshold:.08});
+  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+}
+
+/* ---------- Zahlen einmal hochzaehlen ----------
+   Der Endwert steht im HTML. Ohne JavaScript bleibt er unveraendert. */
+if (!prefersReduced()) {
+  var cio = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      cio.unobserve(en.target);
+      countUp();
+    });
+  }, {threshold:.35});
+  document.querySelectorAll('.stats').forEach(function(el){ cio.observe(el); });
+}
 
 render(0);
 </script>
