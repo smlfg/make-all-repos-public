@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>README-Benchmark vom 23.09.2026 — was 9 Modelle über fremden Code schreiben</title>
+<meta name="description" content="Ein Modellvergleich: dieselbe README-Aufgabe an 9 Modelle, gleiche Harness, blind bewertet. Mit Dateiliste und deterministischem Prüfer schreibt ein kostenloses Modell die besten READMEs.">
+<style>
+:root{
+  --bg:#fcfcfb; --fg:#0b0b0b; --muted:#52514e; --line:#e8e7e3;
+  --a1:#2a78d6; --a2:#eb6834;
+  --card:#f6f5f2; --code:#f0efec;
+  --max:1080px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#1a1a19; --fg:#ffffff; --muted:#c3c2b7; --line:#383835;
+    --a1:#3987e5; --a2:#d95926;
+    --card:#222220; --code:#262624;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font:17px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-synthesis-weight:none;
+}
+.skip{position:absolute;left:-9999px}
+.skip:focus{left:12px;top:12px;z-index:10;background:var(--bg);padding:8px 14px;border:1px solid var(--line);border-radius:6px}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--a1);outline-offset:2px;border-radius:3px}
+
+.wrap{max-width:var(--max);margin:0 auto;padding:0 16px}
+@media (min-width:900px){.wrap{padding:0 24px}}
+
+section{padding:56px 0;border-top:1px solid var(--line)}
+section:first-of-type{border-top:0}
+.eyebrow{
+  font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 10px;font-weight:600;
+}
+h2{font-size:1.6rem;line-height:1.2;margin:0 0 8px;letter-spacing:-.01em}
+h3{font-size:1.02rem;line-height:1.35;margin:0 0 6px;letter-spacing:-.005em}
+.lead{margin:0 0 28px;max-width:62ch;color:var(--muted);font-size:1.02rem}
+p{margin:0 0 14px;max-width:68ch}
+.small{font-size:.86rem;color:var(--muted)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em}
+
+/* ---------- Hero ---------- */
+header{padding:72px 0 60px}
+.thesis{
+  font-family:Georgia,"Iowan Old Style","Times New Roman",serif;
+  font-size:clamp(1.9rem,5.2vw,3.15rem);line-height:1.13;
+  letter-spacing:-.022em;margin:0 0 20px;max-width:19ch;
+  text-wrap:balance;
+}
+.thesis .arrow{color:var(--muted);font-style:normal}
+.sub{max-width:56ch;color:var(--muted);font-size:1.08rem;margin:0 0 38px}
+.stats{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;grid-template-columns:1fr}
+@media (min-width:760px){.stats{grid-template-columns:repeat(3,1fr)}}
+.stat{background:var(--bg);padding:22px 24px 24px}
+.stat::before{content:"";display:block;width:26px;height:2px;background:var(--a1);margin-bottom:16px}
+.stat:nth-child(2)::before{background:var(--a2)}
+.stat:nth-child(3)::before{background:var(--a1)}
+.stat .n{
+  display:block;font-size:1.72rem;font-weight:600;letter-spacing:-.02em;
+  line-height:1.15;margin-bottom:2px;
+}
+.stat .n .arrow{color:var(--muted);font-weight:400}
+.stat .n .name{font-size:1.02rem;font-weight:500;letter-spacing:-.01em}
+.stat .cap{display:block;font-size:.85rem;color:var(--muted);margin-top:8px;line-height:1.45}
+
+/* ---------- Textgitter ---------- */
+.two{display:grid;gap:34px;align-items:start}
+@media (min-width:860px){.two{grid-template-columns:1fr 380px;gap:52px}}
+
+/* ---------- Karten ---------- */
+.cards{display:grid;gap:16px;grid-template-columns:1fr}
+@media (min-width:680px){.cards{grid-template-columns:1fr 1fr}}
+@media (min-width:1020px){.cards.four{grid-template-columns:repeat(4,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 20px 22px}
+.card .num{
+  display:block;font-size:.78rem;color:var(--muted);font-weight:600;
+  letter-spacing:.1em;margin-bottom:10px;
+}
+.card p{font-size:.94rem;margin:0 0 12px;max-width:none}
+.card .fig{
+  display:block;font-size:1.3rem;font-weight:600;letter-spacing:-.015em;
+  padding-top:12px;margin-top:14px;border-top:1px solid var(--line);
+}
+.card .fig .arrow{color:var(--muted);font-weight:400}
+
+/* ---------- Ablauf ---------- */
+.flow{width:100%;height:auto;display:block}
+
+/* ---------- Diagramme ---------- */
+.figs{display:grid;gap:28px;grid-template-columns:1fr}
+@media (min-width:900px){.figs{grid-template-columns:1fr 1fr;gap:34px}}
+/* Grid-Kinder dürfen nie breiter als ihre Spalte werden — sonst erzwingen die
+   width-Attribute der Bilder eine min-content-Spalte und die Seite scrollt horizontal. */
+.figs > *{min-width:0}
+.figs img{display:block;width:100%;max-width:560px;height:auto;margin:0 auto}
+.fig-cap{margin:14px 0 0;font-size:.9rem;color:var(--muted);max-width:46ch}
+.chart{width:100%;height:auto;display:block;max-width:560px;margin:0 auto}
+
+/* ---------- Tabelle ---------- */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin:26px 0 0}
+table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:620px}
+caption{caption-side:top;text-align:left;padding:16px 18px 0;font-size:.86rem;color:var(--muted)}
+th,td{padding:9px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{font-size:.74rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+tbody th{font-weight:500}
+td.n{white-space:nowrap;font-variant-numeric:tabular-nums}
+tr.dim td,tr.dim th{color:var(--muted)}
+.foot{margin:12px 0 0;font-size:.82rem;color:var(--muted);max-width:70ch}
+
+/* ---------- Galerie ---------- */
+.gal-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 22px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{
+  font:inherit;font-size:.86rem;line-height:1.2;padding:9px 15px;cursor:pointer;
+  background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;
+}
+.tab[aria-selected="true"]{color:var(--fg);border-color:var(--a1);box-shadow:inset 0 0 0 1px var(--a1)}
+.tab:focus-visible{outline:2px solid var(--a1);outline-offset:2px}
+.gal-hint{font-size:.85rem;color:var(--muted);margin:0}
+
+.track{
+  display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;
+  padding:4px 16px 20px;margin:0 -16px;scroll-padding-left:16px;
+  scrollbar-width:thin;cursor:grab;-webkit-overflow-scrolling:touch;
+}
+.track.dragging{cursor:grabbing;scroll-snap-type:none}
+.track::-webkit-scrollbar{height:6px}
+.track::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+.gcard{
+  flex:0 0 auto;width:min(82vw,300px);scroll-snap-align:center;
+  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:20px;display:flex;flex-direction:column;min-height:262px;
+}
+.gcard .letter{
+  font-size:3.1rem;font-weight:600;line-height:1;letter-spacing:-.04em;margin:0 0 4px;
+}
+.gcard .only{font-size:.8rem;color:var(--muted);margin:0 0 14px}
+.gcard .status{font-size:.82rem;color:var(--muted);margin:0 0 14px}
+.gcard .acts{display:flex;gap:8px;margin-top:auto;flex-wrap:wrap}
+.btn{
+  font:inherit;font-size:.83rem;line-height:1.2;padding:9px 14px;cursor:pointer;border-radius:8px;
+  border:1px solid var(--line);background:transparent;color:var(--fg);text-decoration:none;
+  display:inline-block;
+}
+.btn:hover{border-color:var(--a1)}
+.btn.primary{border-color:var(--a1);box-shadow:inset 0 0 0 1px var(--a1)}
+.gcard .rev{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);display:none}
+.gcard.open .rev{display:block}
+.gcard .model{font-size:1.05rem;font-weight:600;letter-spacing:-.01em;word-break:break-word}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 14px}
+.tag{
+  font-size:.7rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);
+  border:1px solid var(--line);border-radius:999px;padding:3px 9px;
+}
+.tag.paid{color:var(--a2);border-color:var(--a2)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 14px;font-size:.84rem;margin:0 0 14px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;font-variant-numeric:tabular-nums}
+.stufe{font-weight:600}
+.blockquote{
+  margin:0;font-size:.88rem;color:var(--muted);border-left:2px solid var(--line);padding-left:12px;
+}
+.dots{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin:4px 0 0}
+.dot{
+  width:8px;height:8px;padding:0;border-radius:50%;border:1px solid var(--line);
+  background:transparent;cursor:pointer;
+}
+.dot[aria-current="true"]{background:var(--a1);border-color:var(--a1)}
+.nav{display:flex;gap:8px;justify-content:center;margin:0 0 10px}
+.nav .btn{padding:7px 14px}
+
+/* ---------- Pipeline ---------- */
+.steps{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;grid-template-columns:1fr}
+@media (min-width:760px){.steps{grid-template-columns:1fr 1fr 1fr}}
+.step{background:var(--bg);padding:20px 22px 22px}
+.step .k{
+  display:block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;margin-bottom:10px;
+}
+.step p{font-size:.93rem;margin:10px 0 0;max-width:none}
+.step .who{font-weight:600;font-size:1.02rem;letter-spacing:-.01em;display:block}
+
+/* ---------- Grenzen ---------- */
+.limits{margin:0;padding:0;list-style:none;max-width:72ch}
+.limits li{padding:14px 0;border-top:1px solid var(--line);font-size:.96rem}
+.limits li:first-child{border-top:0}
+.limits b{font-weight:600}
+
+/* ---------- Footer ---------- */
+footer{padding:44px 0 64px;border-top:1px solid var(--line);font-size:.88rem;color:var(--muted)}
+.links{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0 0 20px;padding:0;list-style:none}
+.links a{border-bottom:1px solid var(--line);text-decoration:none}
+.links a:hover{border-color:var(--a1)}
+.flabel{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600}
+
+@media (prefers-reduced-motion:reduce){
+  *{scroll-behavior:auto !important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#inhalt">Zum Inhalt springen</a>
+
+<!-- ============ 1. HERO ============ -->
+<header>
+  <div class="wrap">
+    <p class="eyebrow">Benchmark vom 23.09.2026 · OpenCode</p>
+    <h1 class="thesis">Mit Dateiliste und Prüfer schreibt ein kostenloses Modell die besten READMEs.</h1>
+    <p class="sub">
+      Zwei Repos, acht Modelle, eine Harness: dieselbe README-Aufgabe, dieselben Regeln.
+      Was wir wissen wollten — wie ehrlich schreibt ein KI-Agent über Code, den er nicht geschrieben hat?
+    </p>
+    <div class="stats">
+      <div class="stat">
+        <span class="n"><span class="arrow">→</span> 100 %</span>
+        <span class="cap">Pfad-Treue, sobald die Dateiliste im Prompt liegt. Ausgangswert 61 %, gleiches Modell, gleicher Prüfer, 16 READMEs.</span>
+      </div>
+      <div class="stat">
+        <span class="n"><span class="arrow">→</span> 0</span>
+        <span class="cap">Erfundene Pfade im selben Lauf. Ausgangswert 28. Geprüft wurde deterministisch, nicht von einem Modell.</span>
+      </div>
+      <div class="stat">
+        <span class="n"><span class="name">muse-spark-1.2</span></span>
+        <span class="cap">Gewinnt beide Repos im Blindtest. Kostenlos. Das teuerste Modell im Vergleich landet nur auf Platz „gut“.</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="inhalt">
+
+<!-- ============ 2. DIE FRAGE & DER AUFBAU ============ -->
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Die Frage</p>
+    <h2>Zwei Messungen, weil eine nicht reicht</h2>
+    <p class="lead">
+      Maschinell lässt sich fragen: <em>existieren die Pfade, die das Modell in Backticks nennt?</em>
+      Diese Frage ist billig, eindeutig und täuscht sich nicht. Sie sagt aber nichts darüber, ob sich das
+      README gut liest. Die zweite Frage ist die teurere — und die einzige, die die Autoren der READMEs selbst
+      beantworten können: <em>Liest sich das für einen Fremden gut?</em>
+    </p>
+    <p class="lead">
+      Der Aufbau hält beides auseinander. Die Maschine misst, ohne zu raten. Der Mensch urteilt, ohne zu wissen,
+      welches Modell geliefert hat. Erst wenn beide Urteile vorliegen, wird aufgedeckt.
+    </p>
+
+    <div class="two">
+      <div>
+        <h3>Was „blind“ hier heißt</h3>
+        <p>
+          Die vorgelegten READMEs trugen nur einen Buchstaben: A, B, C … Kein Modellname, kein Harness,
+          kein Repo. Auch der Messerator kannte nur Buchstaben, nicht das Modell. Erst nach dem Urteil
+          wurde die Zuordnung geöffnet — sonst bewertet man die Marke statt der Arbeit.
+        </p>
+        <p>
+          Dass das trägt, zeigt eine Beobachtung: Die Blind-Prognosen „das ist deepseek“ lagen zweimal daneben
+          — der Bewerter erkannte das Modell nicht am Stil.
+        </p>
+      </div>
+      <div>
+        <svg class="flow" viewBox="0 0 380 550" role="img" aria-label="Ablauf: Ein Auftrag geht an neun Modelle in derselben Harness, mit Dateiliste, danach prüft ein deterministischer Pfad-Prüfer, und ein blindes Urteil entscheidet.">
+          <defs>
+            <marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0 L8 4 L0 8 z" fill="var(--muted)"/>
+            </marker>
+          </defs>
+          <g font-family="system-ui,-apple-system,Segoe UI,sans-serif">
+            <g>
+              <rect x="40" y="10" width="300" height="56" rx="9" fill="var(--card)" stroke="var(--line)"/>
+              <text x="190" y="33" text-anchor="middle" font-size="13" font-weight="600" fill="var(--fg)">Ein Auftrag</text>
+              <text x="190" y="50" text-anchor="middle" font-size="10.5" fill="var(--muted)">README überarbeiten, gleiche Regeln für alle</text>
+            </g>
+            <line x1="190" y1="70" x2="190" y2="99" stroke="var(--muted)" stroke-width="1" marker-end="url(#ah)"/>
+            <g>
+              <rect x="40" y="104" width="300" height="56" rx="9" fill="var(--card)" stroke="var(--line)"/>
+              <text x="190" y="127" text-anchor="middle" font-size="13" font-weight="600" fill="var(--fg)">9 Modelle</text>
+              <text x="190" y="144" text-anchor="middle" font-size="10.5" fill="var(--muted)">8 Messläufe, 1 ausgeschlossen (401)</text>
+            </g>
+            <line x1="190" y1="164" x2="190" y2="193" stroke="var(--muted)" stroke-width="1" marker-end="url(#ah)"/>
+            <g>
+              <rect x="40" y="198" width="300" height="56" rx="9" fill="var(--card)" stroke="var(--line)"/>
+              <text x="190" y="221" text-anchor="middle" font-size="13" font-weight="600" fill="var(--fg)">Gleiche Harness</text>
+              <text x="190" y="238" text-anchor="middle" font-size="10.5" fill="var(--muted)">OpenCode, identischer Prompt für alle</text>
+            </g>
+            <line x1="190" y1="258" x2="190" y2="287" stroke="var(--muted)" stroke-width="1" marker-end="url(#ah)"/>
+            <g>
+              <rect x="40" y="292" width="300" height="56" rx="9" fill="var(--card)" stroke="var(--line)"/>
+              <text x="190" y="315" text-anchor="middle" font-size="13" font-weight="600" fill="var(--fg)">Dateiliste</text>
+              <text x="190" y="332" text-anchor="middle" font-size="10.5" fill="var(--muted)">git ls-files liegt im Prompt</text>
+            </g>
+            <line x1="190" y1="352" x2="190" y2="381" stroke="var(--muted)" stroke-width="1" marker-end="url(#ah)"/>
+            <g>
+              <rect x="40" y="386" width="300" height="56" rx="9" fill="var(--card)" stroke="var(--line)"/>
+              <text x="190" y="409" text-anchor="middle" font-size="13" font-weight="600" fill="var(--fg)">Pfad-Prüfer</text>
+              <text x="190" y="426" text-anchor="middle" font-size="10.5" fill="var(--muted)">deterministisch, kein Modell</text>
+            </g>
+            <line x1="190" y1="446" x2="190" y2="475" stroke="var(--muted)" stroke-width="1" marker-end="url(#ah)"/>
+            <g>
+              <rect x="40" y="480" width="300" height="56" rx="9" fill="var(--card)" stroke="var(--line)"/>
+              <text x="190" y="503" text-anchor="middle" font-size="13" font-weight="600" fill="var(--fg)">Blindurteil</text>
+              <text x="190" y="520" text-anchor="middle" font-size="10.5" fill="var(--muted)">Bewerter sieht nur A–H</text>
+            </g>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. HAUPTERGEBNIS BENCHMARK 2 ============ -->
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Hauptergebnis · Benchmark 2</p>
+    <h2>Höchste Treue ist nicht automatisch das beste Urteil</h2>
+    <p class="lead">
+      Zwei Repos, acht Modelle, eine Harness. Waagerecht die gemessene Pfad-Treue, senkrecht das blinde
+      Urteil in vier Stufen. Blau: kostenlos. Orange: Abo. Die beiden Achsen erzählen nicht dieselbe Geschichte.
+    </p>
+
+    <div class="figs">
+
+      <!-- ===== hai-mcp ===== -->
+      <div>
+        <h3>hai-mcp: 100 % Treue, Urteil „gut“</h3>
+        <svg class="chart" viewBox="0 0 560 370" role="img" aria-label="Streudiagramm hai-mcp: gpt-5.5 erreicht 100 Prozent Pfad-Treue und wird als gut bewertet. muse-spark-1.3 erreicht 80 Prozent und wird als Spitze bewertet. muse-spark-1.2 liegt bei 82 Prozent, Urteil Spitze. mimo-v2.6 bei 83 Prozent, Urteil schwach. nemotron-3-ultra bei 85 Prozent, Urteil schwach. deepseek-v4.1-flash bei 81 Prozent, Urteil Spitze. ling-3.0 bei 79 Prozent, Urteil gut.">
+          <g font-family="system-ui,-apple-system,Segoe UI,sans-serif" font-size="11" fill="var(--muted)">
+            <line x1="60" y1="56" x2="510" y2="56" stroke="var(--line)" stroke-width="1"/>
+            <line x1="60" y1="138" x2="510" y2="138" stroke="var(--line)" stroke-width="1"/>
+            <line x1="60" y1="220" x2="510" y2="220" stroke="var(--line)" stroke-width="1"/>
+            <line x1="60" y1="302" x2="510" y2="302" stroke="var(--line)" stroke-width="1"/>
+            <line x1="60" y1="28" x2="60" y2="314" stroke="var(--line)" stroke-width="1"/>
+            <line x1="60" y1="314" x2="510" y2="314" stroke="var(--line)" stroke-width="1"/>
+
+            <text x="52" y="60" text-anchor="end">Spitze</text>
+            <text x="52" y="142" text-anchor="end">gut</text>
+            <text x="52" y="224" text-anchor="end">mittel</text>
+            <text x="52" y="306" text-anchor="end">schwach</text>
+
+            <text x="60" y="330" text-anchor="middle">60</text>
+            <text x="160" y="330" text-anchor="middle">70</text>
+            <text x="260" y="330" text-anchor="middle">80</text>
+            <text x="360" y="330" text-anchor="middle">90</text>
+            <text x="460" y="330" text-anchor="middle">100</text>
+            <text x="285" y="352" text-anchor="middle">Pfad-Treue (%)</text>
+            <text x="16" y="170" text-anchor="middle" transform="rotate(-90 16 170)">Blindurteil</text>
+
+            <circle cx="452" cy="18" r="4.5" fill="var(--a1)"/>
+            <text x="462" y="22">kostenlos</text>
+            <circle cx="452" cy="34" r="4.5" fill="var(--a2)"/>
+            <text x="462" y="38">Abo</text>
+          </g>
+
+          <!-- Punkte -->
+          <g stroke="var(--bg)" stroke-width="1.5">
+            <circle cx="260" cy="56" r="5.5" fill="var(--a1)"/>
+            <circle cx="270" cy="56" r="5.5" fill="var(--a2)"/>
+            <circle cx="280" cy="56" r="5.5" fill="var(--a1)"/>
+            <circle cx="460" cy="138" r="5.5" fill="var(--a2)"/>
+            <circle cx="250" cy="138" r="5.5" fill="var(--a1)"/>
+            <circle cx="310" cy="302" r="5.5" fill="var(--a1)"/>
+            <circle cx="290" cy="302" r="5.5" fill="var(--a1)"/>
+          </g>
+
+          <!-- Beschriftungen, kollisionsfrei versetzt -->
+          <g font-family="system-ui,-apple-system,Segoe UI,sans-serif" font-size="11" fill="var(--fg)">
+            <text x="248" y="30" text-anchor="end">muse-spark-1.3</text>
+            <text x="282" y="30" text-anchor="start">deepseek</text>
+            <text x="292" y="80" text-anchor="start">muse-spark-1.2</text>
+            <text x="446" y="118" text-anchor="end">gpt-5.5</text>
+            <text x="236" y="118" text-anchor="end">ling-3.0</text>
+            <text x="324" y="322" text-anchor="start">nemotron-3-ultra</text>
+            <text x="276" y="322" text-anchor="end">mimo-v2.6</text>
+          </g>
+        </svg>
+        <p class="fig-cap">
+          gpt-5.5 hat die perfekte Treue und das zweitbeste Urteil der Runde.
+          muse-spark-1.3 liegt 20 Prozent darunter und landet trotzdem in der Spitzengruppe.
+        </p>
+      </div>
+
+      <!-- ===== sidecar-ng ===== -->
+      <div>
+        <h3>sidecar-ng: 100 % Treue, Urteil von „mittel“ bis „Spitze“</h3>
+        <svg class="chart" viewBox="0 0 560 370" role="img" aria-label="Streudiagramm sidecar-ng: muse-spark-1.2 erreicht 100 Prozent Pfad-Treue und wird als Spitze bewertet. Vier Modelle liegen ebenfalls bei 100 Prozent mit Urteil gut: muse-spark-1.3, gpt-5.5, mimo-v2.6 und deepseek. nemotron-3.5 liegt bei 100 Prozent mit Urteil mittel. ling-3.0 bei 73 Prozent mit Urteil schwach. nemotron-3-ultra bei 67 Prozent mit Urteil mittel.">
+          <g font-family="system-ui,-apple-system,Segoe UI,sans-serif" font-size="11" fill="var(--muted)">
+            <line x1="60" y1="56" x2="510" y2="56" stroke="var(--line)" stroke-width="1"/>
+            <line x1="60" y1="138" x2="510" y2="138" stroke="var(--line)" stroke-width="1"/>
+            <line x1="60" y1="220" x2="510" y2="220" stroke="var(--line)" stroke-width="1"/>
+            <line x1="60" y1="302" x2="510" y2="302" stroke="var(--line)" stroke-width="1"/>
+            <line x1="60" y1="28" x2="60" y2="314" stroke="var(--line)" stroke-width="1"/>
+            <line x1="60" y1="314" x2="510" y2="314" stroke="var(--line)" stroke-width="1"/>
+
+            <text x="52" y="60" text-anchor="end">Spitze</text>
+            <text x="52" y="142" text-anchor="end">gut</text>
+            <text x="52" y="224" text-anchor="end">mittel</text>
+            <text x="52" y="306" text-anchor="end">schwach</text>
+
+            <text x="60" y="330" text-anchor="middle">60</text>
+            <text x="160" y="330" text-anchor="middle">70</text>
+            <text x="260" y="330" text-anchor="middle">80</text>
+            <text x="360" y="330" text-anchor="middle">90</text>
+            <text x="460" y="330" text-anchor="middle">100</text>
+            <text x="285" y="352" text-anchor="middle">Pfad-Treue (%)</text>
+            <text x="16" y="170" text-anchor="middle" transform="rotate(-90 16 170)">Blindurteil</text>
+
+            <circle cx="452" cy="18" r="4.5" fill="var(--a1)"/>
+            <text x="462" y="22">kostenlos</text>
+            <circle cx="452" cy="34" r="4.5" fill="var(--a2)"/>
+            <text x="462" y="38">Abo</text>
+          </g>
+
+          <!-- Punkte -->
+          <g stroke="var(--bg)" stroke-width="1.5">
+            <circle cx="460" cy="56" r="5.5" fill="var(--a1)"/>
+            <circle cx="460" cy="138" r="5.5" fill="var(--a1)"/>
+            <circle cx="460" cy="220" r="5.5" fill="var(--a1)"/>
+            <circle cx="130" cy="220" r="5.5" fill="var(--a1)"/>
+            <circle cx="190" cy="302" r="5.5" fill="var(--a1)"/>
+          </g>
+          <!-- Vier Modelle exakt übereinander: eine senkrechte Key-Achse statt vier Linien -->
+          <g stroke="var(--muted)" stroke-width="1" fill="none">
+            <line x1="460" y1="138" x2="452" y2="138"/>
+            <line x1="452" y1="100" x2="452" y2="176"/>
+          </g>
+          <g stroke="var(--bg)" stroke-width="1.5">
+            <circle cx="452" cy="102" r="3.5" fill="var(--a1)"/>
+            <circle cx="452" cy="118" r="3.5" fill="var(--a2)"/>
+            <circle cx="452" cy="158" r="3.5" fill="var(--a1)"/>
+            <circle cx="452" cy="174" r="3.5" fill="var(--a2)"/>
+          </g>
+
+          <g font-family="system-ui,-apple-system,Segoe UI,sans-serif" font-size="11" fill="var(--fg)">
+            <text x="472" y="40" text-anchor="start">muse-spark-1.2</text>
+            <text x="472" y="242" text-anchor="start">nemotron-3.5</text>
+            <text x="116" y="202" text-anchor="end">nemotron-3-ultra</text>
+            <text x="202" y="326" text-anchor="start">ling-3.0</text>
+            <text x="440" y="90" text-anchor="end">muse-spark-1.3</text>
+            <text x="440" y="108" text-anchor="end">deepseek</text>
+            <text x="440" y="148" text-anchor="end">mimo-v2.6</text>
+            <text x="440" y="166" text-anchor="end">gpt-5.5</text>
+          </g>
+        </svg>
+        <p class="fig-cap">
+          Sechs Modelle mit 100 % Treue, Urteile von „mittel“ bis „Spitze“.
+          ling-3.0 verliert, weil es die Aufgabe verfehlt — nicht, weil es lügt.
+        </p>
+      </div>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <caption>Ergebnis Benchmark 2, beide Repos. Urteil / Pfad-Treue / Zeilen je Repo.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Modell</th>
+            <th scope="col">hai-mcp</th>
+            <th scope="col">Sidecar-ng</th>
+            <th scope="col">Kostet</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">muse-spark-1.2 <span class="small">(free)</span></th><td class="n">Spitze / 82 % / 379</td><td class="n">Spitze / 100 % / 157</td><td class="n">0 $</td></tr>
+          <tr><th scope="row">deepseek-v4.1-flash</th><td class="n">Spitze* / 81 % / 366</td><td class="n">gut / 100 % / 131</td><td class="n">OpenCode-Go-Abo</td></tr>
+          <tr><th scope="row">muse-spark-1.3 <span class="small">(free)</span></th><td class="n">Spitze / 80 % / 348</td><td class="n">gut / 100 % / 72</td><td class="n">0 $</td></tr>
+          <tr><th scope="row">gpt-5.5</th><td class="n">gut / 100 % / 81</td><td class="n">gut / 100 % / 60</td><td class="n">Codex-Abo</td></tr>
+          <tr><th scope="row">mimo-v2.6-flash <span class="small">(free)</span></th><td class="n">schwach (zu lang) / 83 % / 373</td><td class="n">gut / 100 % / 132</td><td class="n">0 $</td></tr>
+          <tr><th scope="row">ling-3.0-flash <span class="small">(free)</span></th><td class="n">gut / 79 % / 360</td><td class="n">schwach (Aufgabe verfehlt)* / 73 % / 66</td><td class="n">0 $</td></tr>
+          <tr><th scope="row">nemotron-3-ultra <span class="small">(free)</span></th><td class="n">schwach / 85 % / 188</td><td class="n">mittel / 67 % / 125</td><td class="n">0 $</td></tr>
+          <tr><th scope="row">nemotron-3.5-lightning <span class="small">(free)</span></th><td class="n">– (nichts geändert)</td><td class="n">mittel / 100 % / 69</td><td class="n">0 $</td></tr>
+          <tr class="dim"><th scope="row">MiniMax-M3</th><td class="n">ausgeschlossen (401)</td><td class="n">ausgeschlossen</td><td class="n">–</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="foot">
+      * Der Buchstabe wurde im Transkript nicht gesprochen; die Zuordnung folgt aus der Reihenfolge.
+      Beim Pfad-Treue-Wert für hai-mcp sind die 26 fehlenden Pfade zu 5 Laufzeit-Artefakten und Platzhaltern
+      zurückzurechnen — Original-README 74 %, über alle acht Einträge genau ein neu erfundener Pfad.
+    </p>
+  </div>
+</section>
+
+<!-- ============ 3b. BLIND-GALERIE ============ -->
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Blind-Galerie</p>
+    <h2>Swipe durch die READMEs, dann aufdecken</h2>
+    <p class="lead">
+      Jede Karte ist genau das, was der Bewerter zuerst sah: ein Buchstabe. Wischen, blättern oder die
+      Pfeiltasten benutzen — erst wenn du dir ein Urteil gebildet hast, legst du die Karte um.
+    </p>
+
+    <div class="gal-bar">
+      <div class="tabs" role="tablist" aria-label="Benchmark-Runde">
+        <button class="tab" role="tab" data-round="0" aria-selected="true">Blindtest 1 · 9 Karten</button>
+        <button class="tab" role="tab" data-round="1" aria-selected="false">hai-mcp · 8 Karten</button>
+        <button class="tab" role="tab" data-round="2" aria-selected="false">sidecar-ng · 8 Karten</button>
+      </div>
+    </div>
+    <p class="gal-hint" id="galHint"></p>
+
+    <div class="track" id="track" tabindex="0" role="group" aria-label="Benchmark-Karten, horizontal blätterbar"></div>
+
+    <div class="nav">
+      <button class="btn" id="prev" aria-label="Vorherige Karte">←</button>
+      <button class="btn" id="next" aria-label="Nächste Karte">→</button>
+    </div>
+    <div class="dots" id="dots" role="tablist" aria-label="Karte wählen"></div>
+  </div>
+</section>
+
+<!-- ============ 4. VIER LektionEN ============ -->
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Vier Lektionen</p>
+    <h2>Was davon bleibt, wenn man die Zahlen wegnimmt</h2>
+
+    <div class="cards four">
+      <div class="card">
+        <span class="num">01</span>
+        <h3>Die Dateiliste schlägt die Modellwahl</h3>
+        <p>Ein Modell, 16 zurückgehaltene READMEs. Nur eine Änderung am Auftrag: die Dateiliste kam mit in den Prompt, dazu die Regel, jeder Pfad muss darin stehen. Zwei Änderungen gebündelt — der Effekt ist trotzdem größer als der Abstand zwischen den Modellen.</p>
+        <span class="fig"><span class="arrow">61 %</span> → 100 %</span>
+      </div>
+      <div class="card">
+        <span class="num">02</span>
+        <h3>Blindurteil und Messung sind zwei Sachen</h3>
+        <p>Wer 100 % Treue hat, schreibt nicht automatisch das beste README. Wer 80 % hat, schon. Aus beiden Messungen zusammen bekommt man eine Empfehlung; aus einer allein nur eine Zahl.</p>
+        <span class="fig">2 Messungen, 1 Urteil</span>
+      </div>
+      <div class="card">
+        <span class="num">03</span>
+        <h3>Die Harness verzerrt den Vergleich</h3>
+        <p>Im ersten Lauf teilte sich die Szene in bezahlte Modelle in einer Harness und Gratis-Modelle in einer anderen. Ob ein Modell gut ist, wusste man so nicht. Mit einer Harness für alle lag der Sieger woanders als vorher.</p>
+        <span class="fig">1 statt 2 Harnesses</span>
+      </div>
+      <div class="card">
+        <span class="num">04</span>
+        <h3>Ein Agent ist kein Secret-Scanner</h3>
+        <p>21 Repos, ein Agent prüft auf Geheimnisse, parallel gitleaks über die ganze Historie. Neunmal sagte der Agent „veröffentlichen“, obwohl der Scanner Funde hatte — darunter ein Repo mit echten Access-Tokens und eines mit über 1.000 Treffern.</p>
+        <span class="fig"><span class="arrow">9</span> Fehlurteile</span>
+      </div>
+    </div>
+
+    <div class="figs" style="margin-top:40px">
+      <div>
+        <p class="flabel">Belege zu Lektion 01 und 02</p>
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="../docs/assets/manifest-effect-dark.svg">
+          <img src="../docs/assets/manifest-effect-light.svg" width="560" alt="Kennzahlen-Kacheln: Pfad-Treue steigt von 61 Prozent auf 100 Prozent, neu erfundene Pfade sinken von 28 auf 0, sobald das Modell die Dateiliste bekommt." loading="lazy">
+        </picture>
+      </div>
+      <div>
+        <p class="flabel">Belege zu Lektion 03 und 04</p>
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="../docs/assets/blind-vs-metric-dark.svg">
+          <img src="../docs/assets/blind-vs-metric-light.svg" width="560" alt="Streudiagramm von acht Modellen: gemessene Pfad-Treue gegen das blinde Qualitätsurteil. Die beiden Achsen stimmen nicht überein." loading="lazy">
+        </picture>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. EMPFOHLENE PIPELINE ============ -->
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Empfehlung</p>
+    <h2>Was ich daraus bauen würde</h2>
+    <p class="lead">
+      Der teuerste und der stärkste Weg fällt hier zusammen: das beste Modell im Test war kostenlos, und der
+      Zuverlässigkeitsgewinn kommt aus einem Skript. Der Agent darf raten — entscheiden darf er nicht.
+    </p>
+    <div class="steps">
+      <div class="step">
+        <span class="k">Schritt 1</span>
+        <span class="who">muse-spark-1.2</span>
+        <p>Schreibt die README. Kostenlos, in beiden Testrepos das beste Urteil. Bekommt die Dateiliste mit — ohne sie ist es ein anderes Modell.</p>
+      </div>
+      <div class="step">
+        <span class="k">Schritt 2</span>
+        <span class="who">Pfad-Prüfer</span>
+        <p>Geht deterministisch jeden genannten Pfad nach. Findet Fehler, meldet die Liste. Ein LLM prüft hier nichts — das ist der ganze Punkt.</p>
+      </div>
+      <div class="step">
+        <span class="k">Schritt 3</span>
+        <span class="who">deepseek-v4.1-flash</span>
+        <p>Springt nur ein, wenn der Prüfer Fehler findet oder das Modell gar nichts liefert. Abo kostet nur die Ausnahmen, nicht die Fläche.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. EHRLICHE GRENZEN ============ -->
+<section>
+  <div class="wrap">
+    <p class="eyebrow">Ehrliche Grenzen</p>
+    <h2>Wofür diese Zahlen nicht reichen</h2>
+    <ul class="limits">
+      <li><b>n = 2 Repos, 1 Bewerter.</b> Eine Tendenz, kein Gesetz. Ein drittes Repo kann die Reihenfolge ändern.</li>
+      <li><b>MiniMax-M3 fehlt.</b> Der Zugangs-Key lieferte 401. Das ist ein Zugangs- und kein Modellbefund — im ersten Test über einen anderen Provider war MiniMax in der Spitzengruppe.</li>
+      <li><b>Der Prüfer kennt keine Platzhalter.</b> Pfade wie <span class="mono">&lt;project&gt;/…</span> oder Laufzeit-Artefakte zählen als erfunden. Das Original-README von hai-mcp kommt deshalb selbst nur auf 74 %.</li>
+      <li><b>Die Dateiliste hatte eine Nebenwirkung.</b> In einem Repo mit eingebettetem Git-Repository löschte das Modell 20 echte Pfade, weil <span class="mono">git ls-files</span> sie nicht zeigt. Fix: Manifest-Skript, das eingebettete Repos auflöst.</li>
+      <li><b>Die Auswahl der ersten 5 Repos war nicht neutral</b> — sie begünstigte das teuerste Modell. Die spätere Auswahl ist dokumentationsreifer, aber ebenfalls klein.</li>
+      <li><b>Die Metrik prüft Existenz, nicht Bedeutung.</b> Ob eine Beschreibung stimmt, misst sie nicht. Genau dafür gibt es das blinde Urteil.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ 7. FUSSZEILE ============ -->
+<footer>
+  <div class="wrap">
+    <p class="flabel">Rohdaten</p>
+    <ul class="links">
+      <li><a href="../results/01-kopf-an-kopf/ANALYSE.md">01 · Erster Modellvergleich</a></li>
+      <li><a href="../results/02-blindtest-1/URTEIL.md">02 · Blindtest 1 — Urteil</a></li>
+      <li><a href="../results/02-blindtest-1/MESSUNG.md">02 · Blindtest 1 — Messung</a></li>
+      <li><a href="../results/02-blindtest-1/AUFLOESUNG.md">02 · Blindtest 1 — Auflösung</a></li>
+      <li><a href="../results/03-manifest-minitest/ERGEBNIS.md">03 · Dateilisten-Minitest</a></li>
+      <li><a href="../results/04-benchmark-2/AUSWERTUNG.md">04 · Benchmark 2 — Auswertung</a></li>
+      <li><a href="../results/05-agent-vs-scanner/ERGEBNIS.md">05 · Agent vs. Scanner</a></li>
+    </ul>
+
+    <p class="flabel">Die vorgelegten READMEs · hai-mcp</p>
+    <ul class="links">
+      <li><a href="../results/04-benchmark-2/hai-mcp/README_A.html">A</a></li>
+      <li><a href="../results/04-benchmark-2/hai-mcp/README_B.html">B</a></li>
+      <li><a href="../results/04-benchmark-2/hai-mcp/README_C.html">C</a></li>
+      <li><a href="../results/04-benchmark-2/hai-mcp/README_D.html">D</a></li>
+      <li><a href="../results/04-benchmark-2/hai-mcp/README_E.html">E</a></li>
+      <li><a href="../results/04-benchmark-2/hai-mcp/README_F.html">F</a></li>
+      <li><a href="../results/04-benchmark-2/hai-mcp/README_G.html">G</a></li>
+      <li><a href="../results/04-benchmark-2/hai-mcp/README_H.html">H</a></li>
+    </ul>
+
+    <p class="flabel">Die vorgelegten READMEs · Blindtest 1</p>
+    <ul class="links">
+      <li><a href="../results/02-blindtest-1/html/README_A.html">A</a></li>
+      <li><a href="../results/02-blindtest-1/html/README_B.html">B</a></li>
+      <li><a href="../results/02-blindtest-1/html/README_C.html">C</a></li>
+      <li><a href="../results/02-blindtest-1/html/README_D.html">D</a></li>
+      <li><a href="../results/02-blindtest-1/html/README_E.html">E</a></li>
+      <li><a href="../results/02-blindtest-1/html/README_F.html">F</a></li>
+      <li><a href="../results/02-blindtest-1/html/README_G.html">G</a></li>
+      <li><a href="../results/02-blindtest-1/html/README_H.html">H</a></li>
+      <li><a href="../results/02-blindtest-1/html/README_I.html">I</a></li>
+    </ul>
+
+    <p class="small" style="margin-top:28px">
+      Rohdaten aus fünf Läufen vom 23.09.2026. Repo-Namen in den Messungen sind anonymisiert;
+      veröffentlicht sind nur hai-mcp und Sidecar-ng.
+    </p>
+  </div>
+</footer>
+
+<script>
+/* Galerie-Daten. Quelle: results/02-blindtest-1/ und results/04-benchmark-2/ (URTEIL, MESSUNG, AUFLOESUNG). */
+var BT1 = '../results/02-blindtest-1/html/';
+var HAI = '../results/04-benchmark-2/hai-mcp/';
+
+var ROUNDS = [
+  {
+    label: 'Blindtest 1',
+    hint: 'Ein Repo, neun Modelle, zwei Harnesses. Das älteste README aller Karten — der Auftrag war hier noch: README überarbeiten.',
+    cards: [
+      {l:'A', model:'mimo-v2.6-flash', provider:'opencode', paid:false, ok:true,  treue:'94 %', extra:'16/17', dichte:'3,0', zeilen:54, stufe:'gut',        quote:'schöne semantische Gliederung, gute Struktur, Grenzen klar: "würdiger Kandidat"', href:BT1+'README_A.html'},
+      {l:'B', model:'nemotron-3.5-lightning', provider:'opencode', paid:false, ok:false, treue:'71 %', extra:'10/14', dichte:'3,3', zeilen:30, stufe:null,      quote:'README nicht verändert, fällt raus', href:BT1+'README_B.html'},
+      {l:'C', model:'ling-3.0-flash-fin', provider:'opencode', paid:false, ok:true,  treue:'67 %', extra:'12/18', dichte:'1,9', zeilen:63, stufe:'gut',        quote:'Schnellstart klar, Struktur übersichtlich, Ablauf toll, Benchmarks integriert, aber wenig erklärt', href:BT1+'README_C.html'},
+      {l:'D', model:'muse-spark-1.2-contributor', provider:'opencode', paid:false, ok:true,  treue:'100 %', extra:'16/16', dichte:'2,6', zeilen:62, stufe:'mittel',     quote:'Abschnitt "Herkunft" sinnlos für ein öffentliches Repo, "zuerst lesen" nach Quickstart schwach — aber besser aufgedröselt', href:BT1+'README_D.html'},
+      {l:'E', model:'MiniMax-M3', provider:'hermes', paid:true, ok:true,  treue:'94 %', extra:'16/17', dichte:'3,5', zeilen:46, stufe:'Spitze',    quote:'am besten gegliedert, erster Blickeindruck am besten; zwei Teile, Grenzen und Sichtbarkeit gut; Benchmark fehlt', href:BT1+'README_E.html'},
+      {l:'F', model:'nemotron-3-ultra', provider:'opencode', paid:false, ok:true,  treue:'88 %', extra:'14/16', dichte:'2,7', zeilen:51, stufe:'schwach',    quote:'Modellname (Nemotron) im Titel, inhaltlich wohl okay, "nicht bei all meinen Projekten"', href:BT1+'README_F.html'},
+      {l:'G', model:'muse-spark-1.3-contributor', provider:'opencode', paid:false, ok:true,  treue:'94 %', extra:'15/16', dichte:'2,2', zeilen:67, stufe:'schwach',    quote:'Struktur schlecht, wirkt unfertig', href:BT1+'README_G.html'},
+      {l:'H', model:'gpt-5.5', provider:'hermes', paid:true, ok:true,  treue:'100 %', extra:'16/16', dichte:'3,5', zeilen:46, stufe:'Spitze',    quote:'Struktur hier am allerbesten; Absatz "Was gemacht wurde" und Nebenkommentar sehr gut', href:BT1+'README_H.html'},
+      {l:'I', model:'deepseek-v4.1-flash', provider:'hermes', paid:true, ok:true,  treue:'94 %', extra:'16/17', dichte:'2,8', zeilen:57, stufe:'Spitze',    quote:'"Benchmark in Kürze" als Fließtext mit Findings = echter Mehrwert; Struktur gut, Grenzen sehr ausführlich', href:BT1+'README_I.html'}
+    ]
+  },
+  {
+    label: 'hai-mcp',
+    hint: 'Eine Harness, acht Modelle, Dateiliste im Prompt. 373 Zeilen sind viel, 81 Zeilen sind wenig — das Urteil strafte beides.',
+    cards: [
+      {l:'A', model:'mimo-v2.6-flash', provider:'opencode', paid:false, ok:true,  treue:'83 %', extra:'24/29', tools:18, zeit:'180 s', zeilen:373, stufe:'schwach', quote:'zu lang, "würde ich als Fremder nicht lesen"; Bilder gut, aber vermutlich nur übernommen', href:HAI+'README_A.html'},
+      {l:'B', model:'gpt-5.5', provider:'openai', paid:true, ok:true,  treue:'100 %', extra:'16/16', tools:19, zeit:'83 s',  zeilen:81,  stufe:'gut',     quote:'weitaus besser als A, vor allem die Länge; Name mit Link, Start here, Goal, Testen', href:HAI+'README_B.html'},
+      {l:'C', model:'muse-spark-1.3-contributor', provider:'opencode', paid:false, ok:true,  treue:'80 %', extra:'20/25', tools:10, zeit:'41 s',  zeilen:348, stufe:'Spitze', quote:'mit Abstand das beste der ersten drei; bestes Storytelling (Hook "The Problem"), Quickstart zum Pasten, Mermaid ok', href:HAI+'README_C.html'},
+      {l:'D', model:'nemotron-3-ultra', provider:'opencode', paid:false, ok:true,  treue:'85 %', extra:'23/27', tools:5,  zeit:'219 s', zeilen:188, stufe:'schwach', quote:'abgemagert, Links statt eingebetteter Bilder, generisch — "D ist es garantiert nicht"', href:HAI+'README_D.html'},
+      {l:'E', model:'deepseek-v4.1-flash', provider:'opencode-go', paid:true, ok:true,  treue:'81 %', extra:'21/26', tools:11, zeit:'46 s', zeilen:366, stufe:'Spitze', quote:'gutes Storytelling, macht Spaß, lang; Tools erstmals erwähnt, beide Bilder drin — "bisher das beste"', href:HAI+'README_E.html'},
+      {l:'F', model:'muse-spark-1.2-contributor', provider:'opencode', paid:false, ok:true,  treue:'82 %', extra:'23/28', tools:17, zeit:'165 s', zeilen:379, stufe:'Spitze', quote:'sehr stark: Problem / Does / Does-not, Tools in Subkategorien, Workflow und Boundary-Tests', href:HAI+'README_F.html'},
+      {l:'G', model:'nemotron-3.5-lightning', provider:'opencode', paid:false, ok:false, treue:'74 %', extra:'14/19', tools:4,  zeit:'862 s', zeilen:325, stufe:null,      quote:'README nicht verändert', href:HAI+'README_G.html'},
+      {l:'H', model:'ling-3.0-flash-fin', provider:'opencode', paid:false, ok:true,  treue:'79 %', extra:'19/24', tools:12, zeit:'73 s',  zeilen:360, stufe:'gut',     quote:'Workflow und Safety Boundaries, Lineage und Drift inhaltlich gut, Gliederung etwas verdreht', href:HAI+'README_H.html'}
+    ]
+  },
+  {
+    label: 'sidecar-ng',
+    hint: 'Derselbe Auftrag, zweites Repo. Für dieses Repo liegen aus Datenschutzgründen keine HTML-Kopien vor — Karte zeigt Messwerte und Urteil.',
+    cards: [
+      {l:'A', model:'ling-3.0-flash-fin', provider:'opencode', paid:false, ok:true, treue:'73 %', extra:'16/22', tools:14, zeit:'52 s',  zeilen:66,  stufe:'schwach', quote:'schöne Unterüberschrift, auf Deutsch; aber "Lineage und Drift" geht kaum ums Repo, sondern um den Vergleich: Aufgabe verfehlt', href:null},
+      {l:'B', model:'muse-spark-1.3-contributor', provider:'opencode', paid:false, ok:true, treue:'100 %', extra:'19/19', tools:7,  zeit:'71 s',  zeilen:72,  stufe:'gut',     quote:'"weitaus besser": geht ums Projekt, Lesereihenfolge, Quickstart, richtig verstanden, Architektur', href:null},
+      {l:'C', model:'muse-spark-1.2-contributor', provider:'opencode', paid:false, ok:true, treue:'100 %', extra:'22/22', tools:24, zeit:'182 s', zeilen:157, stufe:'Spitze', quote:'noch besser: Code zum Kopieren, erste ASCII-Grafik, Tests und Evals, Kontext V1→V8 — "sehr, sehr stark"', href:null},
+      {l:'D', model:'nemotron-3-ultra', provider:'opencode', paid:false, ok:true, treue:'67 %', extra:'10/15', tools:10, zeit:'211 s', zeilen:125, stufe:'mittel',  quote:'guter Quickstart, 2 ASCII-Grafiken, gute Trennung, aber wenig Prosa und Erklärliebe', href:null},
+      {l:'E', model:'gpt-5.5', provider:'openai', paid:true, ok:true,  treue:'100 %', extra:'11/11', tools:12, zeit:'65 s',  zeilen:60,  stufe:'gut',     quote:'beste Unterüberschrift, Start here, What / How / Boundary', href:null},
+      {l:'F', model:'nemotron-3.5-lightning', provider:'opencode', paid:false, ok:true, treue:'100 %', extra:'5/5', tools:8, zeit:'631 s', zeilen:69,  stufe:'mittel',  quote:'Features-Bullets schön; "Kontext und Linie" gut gemeint, schlecht umgesetzt — "definitiv nicht das Beste"', href:null},
+      {l:'G', model:'mimo-v2.6-flash', provider:'opencode', paid:false, ok:true,  treue:'100 %', extra:'16/16', tools:13, zeit:'388 s', zeilen:132, stufe:'gut',    quote:'Quickstart, Struktur, vereinfachte Architektur als Bonus, Features, Setup', href:null},
+      {l:'H', model:'deepseek-v4.1-flash', provider:'opencode-go', paid:true, ok:true, treue:'100 %', extra:'14/14', tools:29, zeit:'176 s', zeilen:131, stufe:'gut',     quote:'auch gut', href:null}
+    ]
+  }
+];
+
+var track = document.getElementById('track');
+var dots  = document.getElementById('dots');
+var hint  = document.getElementById('galHint');
+var tabs  = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+var current = 0;
+
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function cardHtml(c){
+  var delivered = c.ok
+    ? '<p class="status">README wurde verändert.</p>'
+    : '<p class="status">README wurde nicht verändert.</p>';
+  var open = c.href
+    ? '<a class="btn" href="'+esc(c.href)+'" target="_blank" rel="noopener">README öffnen</a>'
+    : '<span class="btn" aria-disabled="true" style="opacity:.45;cursor:not-allowed">Keine Kopie</span>';
+  var rows = '<dt>Pfad-Treue</dt><dd>'+esc(c.treue)+'</dd>'
+           + '<dt>Genannte Pfade</dt><dd>'+esc(c.extra)+'</dd>';
+  if (c.dichte) rows += '<dt>Dichte</dt><dd>'+esc(c.dichte)+' je 10 Zeilen</dd>';
+  if (c.tools != null) rows += '<dt>Tool-Calls</dt><dd>'+esc(c.tools)+'</dd>';
+  if (c.zeit) rows += '<dt>Zeit</dt><dd>'+esc(c.zeit)+'</dd>';
+  rows += '<dt>Zeilen</dt><dd>'+esc(c.zeilen)+'</dd>';
+  return ''
+    + '<article class="gcard">'
+    +   '<p class="letter">'+esc(c.l)+'</p>'
+    +   '<p class="only">Das war alles, was zu sehen war.</p>'
+    +   delivered
+    +   '<div class="acts">'+open+'<button class="btn primary" type="button">Aufdecken</button></div>'
+    +   '<div class="rev">'
+    +     '<p class="model">'+esc(c.model)+'</p>'
+    +     '<p class="tags"><span class="tag">'+esc(c.provider)+'</span>'
+    +       '<span class="tag'+(c.paid?' paid':'')+'">'+(c.paid?'Abo':'kostenlos')+'</span>'
+    +       '<span class="tag">Urteil: <span class="stufe">'+esc(c.stufe||'—')+'</span></span></p>'
+    +     '<dl class="kv">'+rows+'</dl>'
+    +     '<blockquote class="blockquote">'+esc(c.quote)+'</blockquote>'
+    +   '</div>'
+    + '</article>';
+}
+
+function render(i){
+  current = i;
+  var r = ROUNDS[i];
+  hint.textContent = r.hint;
+  track.innerHTML = r.cards.map(cardHtml).join('');
+  dots.innerHTML = r.cards.map(function(c,k){
+    return '<button class="dot" data-i="'+k+'" aria-label="Karte '+esc(c.l)+'" aria-current="'+(k===0?'true':'false')+'"></button>';
+  }).join('');
+  tabs.forEach(function(t,k){ t.setAttribute('aria-selected', k===i ? 'true':'false'); });
+  track.scrollLeft = 0;
+  updateDot();
+}
+
+function step(){
+  var card = track.querySelector('.gcard');
+  return card ? card.getBoundingClientRect().width + 16 : 316;
+}
+function prefersReduced(){
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+/* Die Karte, deren Mitte der Track-Mitte am nächsten liegt, ist die sichtbare. */
+function currentIndex(){
+  var cards = track.children;
+  if (!cards.length) return 0;
+  var mid = track.getBoundingClientRect().left + track.clientWidth / 2;
+  var best = 0, bestD = Infinity;
+  for (var i = 0; i < cards.length; i++){
+    var r = cards[i].getBoundingClientRect();
+    var d = Math.abs(r.left + r.width / 2 - mid);
+    if (d < bestD){ bestD = d; best = i; }
+  }
+  return best;
+}
+function scrollToIndex(i){
+  var cards = track.children;
+  if (!cards.length) return;
+  i = Math.max(0, Math.min(cards.length - 1, i));
+  cards[i].scrollIntoView({behavior: prefersReduced() ? 'auto' : 'smooth', block:'nearest', inline:'center'});
+}
+function go(dir){ scrollToIndex(currentIndex() + dir); }
+function updateDot(){
+  var idx = currentIndex();
+  Array.prototype.forEach.call(dots.children, function(d,k){
+    d.setAttribute('aria-current', k===idx ? 'true':'false');
+  });
+}
+
+tabs.forEach(function(t){
+  t.addEventListener('click', function(){ render(parseInt(t.dataset.round, 10)); });
+});
+document.getElementById('prev').addEventListener('click', function(){ go(-1); });
+document.getElementById('next').addEventListener('click', function(){ go(1); });
+dots.addEventListener('click', function(e){
+  var d = e.target.closest('.dot');
+  if (!d) return;
+  scrollToIndex(parseInt(d.dataset.i, 10));
+});
+var lastDragEnd = 0;
+track.addEventListener('click', function(e){
+  if (Date.now() - lastDragEnd < 250) return;   /* Klick direkt nach dem Ziehen nicht als Aufdecken werten */
+  var b = e.target.closest('.primary');
+  if (!b) return;
+  var card = b.closest('.gcard');
+  card.classList.toggle('open');
+  b.textContent = card.classList.contains('open') ? 'Wieder zuklappen' : 'Aufdecken';
+});
+track.addEventListener('keydown', function(e){
+  if (e.key === 'ArrowRight'){ e.preventDefault(); go(1); }
+  if (e.key === 'ArrowLeft'){ e.preventDefault(); go(-1); }
+});
+track.addEventListener('scroll', updateDot, {passive:true});
+
+/* Drag-to-swipe */
+var down = false, startX = 0, startLeft = 0, moved = 0;
+track.addEventListener('pointerdown', function(e){
+  if (e.target.closest('a, button')) return;
+  down = true; moved = 0; startX = e.clientX; startLeft = track.scrollLeft;
+  track.classList.add('dragging');
+});
+track.addEventListener('pointermove', function(e){
+  if (!down) return;
+  var dx = e.clientX - startX;
+  moved = Math.max(moved, Math.abs(dx));
+  if (moved > 4) { track.scrollLeft = startLeft - dx; e.preventDefault(); }
+});
+function endDrag(){ down = false; lastDragEnd = Date.now(); track.classList.remove('dragging'); }
+track.addEventListener('pointerup', endDrag);
+track.addEventListener('pointercancel', endDrag);
+track.addEventListener('pointerleave', endDrag);
+
+render(0);
+</script>
+</body>
+</html>

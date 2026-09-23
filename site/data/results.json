@@ -1,0 +1,338 @@
+{
+ "meta": {
+  "date": "2026-09-23",
+  "harness_benchmark2": "OpenCode (all models)",
+  "judge": "1 human, blind (letters only)",
+  "fidelity": "share of backticked paths in the README that exist in the repo",
+  "notes": [
+   "MiniMax-M3 excluded in benchmark 2: provider returned 401 (invalid key)",
+   "hai-mcp original README fidelity: 74 % (runtime artifacts + placeholders)"
+  ]
+ },
+ "benchmarks": [
+  {
+   "id": "benchmark-2/hai-mcp",
+   "readme_texts_public": true,
+   "entries": [
+    {
+     "letter": "A",
+     "model": "mimo-v2.6-flash-free",
+     "verdict": "schwach",
+     "verdict_score": 0,
+     "verdict_note": "zu lang, \"würde ich als Fremder nicht lesen\"; Bilder gut, aber vermutlich nur übernommen",
+     "delivered": true,
+     "fidelity": "83 %",
+     "real_paths": "24/29",
+     "tool_calls": "18",
+     "seconds": "180s",
+     "lines": "373",
+     "readme": "readmes/hai-mcp/README_A.md"
+    },
+    {
+     "letter": "B",
+     "model": "gpt-5.5",
+     "verdict": "gut",
+     "verdict_score": 2,
+     "verdict_note": "weitaus besser als A (v. a. Länge); Name mit Link, Start here, Goal, Testen",
+     "delivered": true,
+     "fidelity": "100 %",
+     "real_paths": "16/16",
+     "tool_calls": "19",
+     "seconds": "83s",
+     "lines": "81",
+     "readme": "readmes/hai-mcp/README_B.md"
+    },
+    {
+     "letter": "C",
+     "model": "muse-spark-1.3-contributor-free",
+     "verdict": "Spitze",
+     "verdict_score": 3,
+     "verdict_note": "\"mit Abstand das beste der ersten drei\", bestes Storytelling (Hook \"The Problem\"), Quickstart zum Pasten, Mermaid ok",
+     "delivered": true,
+     "fidelity": "80 %",
+     "real_paths": "20/25",
+     "tool_calls": "10",
+     "seconds": "41s",
+     "lines": "348",
+     "readme": "readmes/hai-mcp/README_C.md"
+    },
+    {
+     "letter": "D",
+     "model": "nemotron-3-ultra-free",
+     "verdict": "schwach",
+     "verdict_score": 0,
+     "verdict_note": "abgemagert, Links statt eingebetteter Bilder, generisch — \"D ist es garantiert nicht\"",
+     "delivered": true,
+     "fidelity": "85 %",
+     "real_paths": "23/27",
+     "tool_calls": "5",
+     "seconds": "219s",
+     "lines": "188",
+     "readme": "readmes/hai-mcp/README_D.md"
+    },
+    {
+     "letter": "E",
+     "model": "deepseek-v4.1-flash",
+     "verdict": "Spitze",
+     "verdict_score": 3,
+     "verdict_note": "gutes Storytelling, macht Spaß, lang; Tools erstmals erwähnt (\"spitze\"), beide Bilder drin, \"bisher das beste\"",
+     "delivered": true,
+     "fidelity": "81 %",
+     "real_paths": "21/26",
+     "tool_calls": "11",
+     "seconds": "46s",
+     "lines": "366",
+     "readme": "readmes/hai-mcp/README_E.md"
+    },
+    {
+     "letter": "F",
+     "model": "muse-spark-1.2-contributor-free",
+     "verdict": "Spitze",
+     "verdict_score": 3,
+     "verdict_note": "sehr stark: Problem/Does/Does-not, Tools in Subkategorien, Workflow + Boundary-Tests — Prognose: deepseek",
+     "delivered": true,
+     "fidelity": "82 %",
+     "real_paths": "23/28",
+     "tool_calls": "17",
+     "seconds": "165s",
+     "lines": "379",
+     "readme": "readmes/hai-mcp/README_F.md"
+    },
+    {
+     "letter": "G",
+     "model": "nemotron-3.5-lightning-free",
+     "verdict": "–",
+     "verdict_score": null,
+     "verdict_note": "README nicht verändert",
+     "delivered": false,
+     "fidelity": "74 %",
+     "real_paths": "14/19",
+     "tool_calls": "4",
+     "seconds": "862s",
+     "lines": "325",
+     "readme": "readmes/hai-mcp/README_G.md"
+    },
+    {
+     "letter": "H",
+     "model": "ling-3.0-flash-fin-free",
+     "verdict": "gut",
+     "verdict_score": 2,
+     "verdict_note": "gut: Workflow & Safety Boundaries, Lineage & Drift inhaltlich gut, Gliederung etwas verdreht",
+     "delivered": true,
+     "fidelity": "79 %",
+     "real_paths": "19/24",
+     "tool_calls": "12",
+     "seconds": "73s",
+     "lines": "360",
+     "readme": "readmes/hai-mcp/README_H.md"
+    }
+   ]
+  },
+  {
+   "id": "benchmark-2/sidecar-ng",
+   "readme_texts_public": false,
+   "entries": [
+    {
+     "letter": "A",
+     "model": "ling-3.0-flash-fin-free",
+     "verdict": "schwach",
+     "verdict_score": 0,
+     "verdict_note": "schöne Unterüberschrift, auf Deutsch; aber \"Lineage und Drift\" — geht kaum ums Repo, sondern um den Vergleich: Aufgabe verfehlt",
+     "delivered": true,
+     "fidelity": "73 %",
+     "real_paths": "16/22",
+     "tool_calls": "14",
+     "seconds": "52s",
+     "lines": "66"
+    },
+    {
+     "letter": "B",
+     "model": "muse-spark-1.3-contributor-free",
+     "verdict": "gut",
+     "verdict_score": 2,
+     "verdict_note": "\"weitaus besser\": geht ums Projekt, Lesereihenfolge, Quickstart, richtig verstanden, Architektur",
+     "delivered": true,
+     "fidelity": "100 %",
+     "real_paths": "19/19",
+     "tool_calls": "7",
+     "seconds": "71s",
+     "lines": "72"
+    },
+    {
+     "letter": "C",
+     "model": "muse-spark-1.2-contributor-free",
+     "verdict": "Spitze",
+     "verdict_score": 3,
+     "verdict_note": "noch besser: Code zum Kopieren, erste ASCII-Grafik, Tests/Evals, Kontext V1→V8 — \"sehr, sehr stark\"",
+     "delivered": true,
+     "fidelity": "100 %",
+     "real_paths": "22/22",
+     "tool_calls": "24",
+     "seconds": "182s",
+     "lines": "157"
+    },
+    {
+     "letter": "D",
+     "model": "nemotron-3-ultra-free",
+     "verdict": "mittel",
+     "verdict_score": 1,
+     "verdict_note": "guter Quickstart, 2 ASCII-Grafiken, gute Trennung, aber wenig Prosa/Erklärliebe",
+     "delivered": true,
+     "fidelity": "67 %",
+     "real_paths": "10/15",
+     "tool_calls": "10",
+     "seconds": "211s",
+     "lines": "125"
+    },
+    {
+     "letter": "E",
+     "model": "gpt-5.5",
+     "verdict": "gut",
+     "verdict_score": 2,
+     "verdict_note": "beste Unterüberschrift, Start here, What/How/Boundary — gut",
+     "delivered": true,
+     "fidelity": "100 %",
+     "real_paths": "11/11",
+     "tool_calls": "12",
+     "seconds": "65s",
+     "lines": "60"
+    },
+    {
+     "letter": "F",
+     "model": "nemotron-3.5-lightning-free",
+     "verdict": "mittel",
+     "verdict_score": 1,
+     "verdict_note": "Features-Bullets schön; \"Kontext und Linie\" gut gemeint, schlecht umgesetzt — \"definitiv nicht das Beste\"",
+     "delivered": true,
+     "fidelity": "100 %",
+     "real_paths": "5/5",
+     "tool_calls": "8",
+     "seconds": "631s",
+     "lines": "69"
+    },
+    {
+     "letter": "G",
+     "model": "mimo-v2.6-flash-free",
+     "verdict": "gut",
+     "verdict_score": 2,
+     "verdict_note": "Quickstart, Struktur, vereinfachte Architektur = Bonus, Features, Setup — Prognose: deepseek",
+     "delivered": true,
+     "fidelity": "100 %",
+     "real_paths": "16/16",
+     "tool_calls": "13",
+     "seconds": "388s",
+     "lines": "132"
+    },
+    {
+     "letter": "H",
+     "model": "deepseek-v4.1-flash",
+     "verdict": "gut",
+     "verdict_score": 2,
+     "verdict_note": "auch gut",
+     "delivered": true,
+     "fidelity": "100 %",
+     "real_paths": "14/14",
+     "tool_calls": "29",
+     "seconds": "176s",
+     "lines": "131"
+    }
+   ]
+  },
+  {
+   "id": "blindtest-1/make-all-repos-public",
+   "readme_texts_public": true,
+   "entries": [
+    {
+     "letter": "A",
+     "model": "oc-mimo-v2.6-flash-free",
+     "verdict": "gut",
+     "verdict_score": 2,
+     "verdict_note": "schöne semantische Gliederung, gute Struktur, Grenzen klar: \"würdiger Kandidat\"",
+     "delivered": true,
+     "fidelity": "94 % (16/17)",
+     "readme": "readmes/blindtest-1/README_A.md"
+    },
+    {
+     "letter": "B",
+     "model": "oc-nemotron-3.5-lightning-free",
+     "verdict": "–",
+     "verdict_score": null,
+     "verdict_note": "README nicht verändert, fällt raus",
+     "delivered": false,
+     "fidelity": "71 % (10/14)",
+     "readme": "readmes/blindtest-1/README_B.md"
+    },
+    {
+     "letter": "C",
+     "model": "oc-ling-3.0-flash-fin-free",
+     "verdict": "gut",
+     "verdict_score": 2,
+     "verdict_note": "Schnellstart klar, Struktur übersichtlich, Ablauf toll, Benchmarks integriert, aber wenig erklärt",
+     "delivered": true,
+     "fidelity": "67 % (12/18)",
+     "readme": "readmes/blindtest-1/README_C.md"
+    },
+    {
+     "letter": "D",
+     "model": "oc-muse-spark-1.2-contributor-free",
+     "verdict": "mittel",
+     "verdict_score": 1,
+     "verdict_note": "Abschnitt \"Herkunft\" sinnlos für öffentliches Repo; \"zuerst lesen\" nach Quickstart schwach; Benchmark unvollständig; aber besser aufgedröselt",
+     "delivered": true,
+     "fidelity": "100 % (16/16)",
+     "readme": "readmes/blindtest-1/README_D.md"
+    },
+    {
+     "letter": "E",
+     "model": "hermes-MiniMax-M3",
+     "verdict": "Spitze",
+     "verdict_score": 3,
+     "verdict_note": "\"am besten gegliedert, erster Blickeindruck am besten\"; zwei Teile, Grenzen + Sichtbarkeit gut; Benchmark fehlt",
+     "delivered": true,
+     "fidelity": "94 % (16/17)",
+     "readme": "readmes/blindtest-1/README_E.md"
+    },
+    {
+     "letter": "F",
+     "model": "oc-nemotron-3-ultra-free",
+     "verdict": "schwach",
+     "verdict_score": 0,
+     "verdict_note": "Modellname (Nemotron) im Titel, inhaltlich wohl okay, \"nicht bei all meinen Projekten\"",
+     "delivered": true,
+     "fidelity": "88 % (14/16)",
+     "readme": "readmes/blindtest-1/README_F.md"
+    },
+    {
+     "letter": "G",
+     "model": "oc-muse-spark-1.3-contributor-free",
+     "verdict": "schwach",
+     "verdict_score": 0,
+     "verdict_note": "Struktur schlecht, wirkt unfertig",
+     "delivered": true,
+     "fidelity": "94 % (15/16)",
+     "readme": "readmes/blindtest-1/README_G.md"
+    },
+    {
+     "letter": "H",
+     "model": "hermes-gpt-5.5",
+     "verdict": "Spitze",
+     "verdict_score": 3,
+     "verdict_note": "\"Struktur hier am allerbesten\"; Absatz \"Was gemacht wurde\"/Nebenkommentar sehr gut",
+     "delivered": true,
+     "fidelity": "100 % (16/16)",
+     "readme": "readmes/blindtest-1/README_H.md"
+    },
+    {
+     "letter": "I",
+     "model": "hermes-deepseek-v4.1-flash",
+     "verdict": "Spitze",
+     "verdict_score": 3,
+     "verdict_note": "\"Benchmark in Kürze\" als Fließtext mit Findings = echter Mehrwert; Struktur gut, Grenzen sehr ausführlich",
+     "delivered": true,
+     "fidelity": "94 % (16/17)",
+     "readme": "readmes/blindtest-1/README_I.md"
+    }
+   ]
+  }
+ ]
+}
