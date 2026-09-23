@@ -1,0 +1,714 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>README E</title><base href="E/"><style>:root{--bg:#fcfcfb;--fg:#0b0b0b;--muted:#52514e;--line:#d0d7de;--code:#f0efec;--link:#2a78d6}
+@media (prefers-color-scheme:dark){:root{--bg:#1a1a19;--fg:#f2f1ee;--muted:#c3c2b7;--line:#383835;--code:#262624;--link:#6da7ec}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px}a{color:var(--link)}
+h1,h2,h3{line-height:1.25}h1{border-bottom:1px solid var(--line);padding-bottom:.3em}
+table{border-collapse:collapse;display:block;overflow-x:auto}th,td{border:1px solid var(--line);padding:4px 10px;text-align:left}
+code{background:var(--code);color:var(--fg);padding:.1em .3em;border-radius:4px;font-size:.92em}
+pre{background:var(--code);color:var(--fg);padding:12px;border-radius:6px;overflow-x:auto}pre code{padding:0;background:none}
+pre.mermaid{background:transparent;text-align:center}img{max-width:100%}blockquote{border-left:3px solid var(--line);margin:0;padding-left:12px;color:var(--muted)}
+.badge{position:fixed;top:8px;right:12px;font:700 32px system-ui;color:var(--muted);opacity:.6}</style></head><body><div class="badge">E</div><main><h1 id="hai-mcp">HAI-MCP</h1>
+<p><strong>HAI-MCP is the open-source MCP control-plane implementation
+of Human Agent Interface (HAI), created by Samuel Fleig.</strong></p>
+<p>It gives AI coding clients a shared, durable contract for agentic
+work: what is in scope, which session may act, what must be parked, and
+what counts as done. The server is model-agnostic: Claude Code, Cursor,
+Codex, Grok, OpenCode, Hermes, and any other MCP client can call the
+same tools.</p>
+<p>The server itself never calls an LLM.</p>
+<ul>
+<li>Canonical website: <a
+href="https://www.human-agent-interface.com/">https://www.human-agent-interface.com/</a></li>
+<li>About Samuel Fleig: <a
+href="https://www.human-agent-interface.com/samuel/">https://www.human-agent-interface.com/samuel/</a></li>
+<li>Package: <code>hai-mcp</code> v0.1.0, Python 3.12+, MCP SDK
+<code>&lt;2</code></li>
+</ul>
+<p>Lineage: this repository was extracted from the Hermes-coupled prior
+art at <code>~/.config/hai-agent-mcp</code>, which it replaces for
+control-plane work. See <a href="#legacy">Legacy</a> for the drift
+note.</p>
+<h2 id="start-here">Start here</h2>
+<p>New to the repo? Read these first, in order:</p>
+<ol type="1">
+<li><code>GOAL.md</code> — the current slice goal,
+in-scope/out-of-scope, and acceptance criteria.</li>
+<li><code>docs/TOOL_CONTRACT.md</code> — tool mutation/gate matrix,
+paths, artifact names, and error codes.</li>
+<li><code>docs/OWNER_GATE.md</code> — how the owner gate works and which
+modes exist.</li>
+<li><code>src/hai_mcp/server.py</code> — MCP tool registration and the
+transport entry point.</li>
+<li><code>AGENTS.md</code> — contributor rules for agents working in
+this repo.</li>
+</ol>
+<p>For install and client wiring, jump to <a href="#quick-start">Quick
+start</a>.</p>
+<h2 id="repository-layout">Repository layout</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Path</th>
+<th>What lives here</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>src/hai_mcp/</code></td>
+<td>Server, control-plane logic, mission engine, owner gate,
+confinement</td>
+</tr>
+<tr class="even">
+<td><code>tests/</code></td>
+<td>Unit and gate tests</td>
+</tr>
+<tr class="odd">
+<td><code>docs/</code></td>
+<td>Contracts, owner-gate design, plans, wireframes, visuals, client
+snippets</td>
+</tr>
+<tr class="even">
+<td><code>scripts/</code></td>
+<td>Standalone smoke and impact-eval entry points</td>
+</tr>
+<tr class="odd">
+<td><code>pyproject.toml</code></td>
+<td>Package metadata, dependencies, console script, pytest config</td>
+</tr>
+<tr class="even">
+<td><code>uv.lock</code></td>
+<td>Locked dependency set for <code>uv</code></td>
+</tr>
+<tr class="odd">
+<td><code>GOAL.md</code></td>
+<td>Current slice goal and active boundaries</td>
+</tr>
+<tr class="even">
+<td><code>AGENTS.md</code></td>
+<td>Contributor rules for agents</td>
+</tr>
+<tr class="odd">
+<td><code>FOR_SMLFLG.md</code></td>
+<td>Owner-facing project notes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-problem">The problem</h2>
+<p>Agents are good at executing. They are bad at keeping a stable
+contract in their own head.</p>
+<p>Without a control plane, three things happen:</p>
+<ol type="1">
+<li>The goal softens as the chat gets longer.</li>
+<li>Side ideas become work before the owner decided that they
+should.</li>
+<li>"Done" becomes a claim instead of evidence.</li>
+</ol>
+<p>HAI-MCP solves that by moving the working agreement out of the model
+and into a deterministic local server.</p>
+<h2 id="what-hai-mcp-does">What HAI-MCP does</h2>
+<p>HAI-MCP is a local-first MCP server that manages:</p>
+<ul>
+<li>project run-contract artifacts such as
+<code>NEXT_STEP.md</code></li>
+<li>active focus lanes and parked thoughts</li>
+<li>bounded missions with versioned contracts</li>
+<li>time-limited session leases for agents</li>
+<li>deterministic activity checks against a contract</li>
+<li>owner-gated changes that fail closed</li>
+<li>evidence-based mission closure</li>
+<li>day-stop and recovery flows</li>
+</ul>
+<p>Clients call tools. The server validates, writes confined local
+state, and returns structured JSON.</p>
+<h2 id="what-it-is-not">What it is not</h2>
+<p>HAI-MCP is deliberately narrow.</p>
+<p>It is not:</p>
+<ul>
+<li>an LLM or agent runtime</li>
+<li>a harness executor</li>
+<li>an OS sandbox or adversarial security layer</li>
+<li>a semantic verifier for whether the model "really understood" the
+goal</li>
+<li>a commit, push, deploy, or delete tool</li>
+<li>a cloud sync system for <code>HAI_HOME</code></li>
+</ul>
+<p>Its job is the contract layer: explicit scope, explicit leases,
+explicit gates, explicit evidence.</p>
+<h2 id="safety-boundaries">Safety boundaries</h2>
+<p>These boundaries are load-bearing and are preserved from the
+project's original contract:</p>
+<ul>
+<li><strong>No LLM calls inside the server.</strong> The server is
+deterministic; clients bring the model.</li>
+<li><strong>Owner gates fail closed.</strong> A gated action without a
+valid owner code does not proceed.</li>
+<li><strong>No Git mutation.</strong> The server never shells out to
+<code>git</code>, parses <code>.git</code>, commits, stashes, pushes, or
+touches repository state. Clients pass Git telemetry in; HAI-MCP only
+classifies it.</li>
+<li><strong>Confined state.</strong> Writes stay inside
+<code>HAI_HOME</code>, <code>HAI_OWNER_HOME</code>, and the project's
+run-contract directory, with symlink-safe path handling.</li>
+<li><strong>Do not sync <code>HAI_HOME</code>.</strong> Not with
+Dropbox, Syncthing, Git, or similar mirroring — the store holds local
+paths and lock-protected state.</li>
+<li><strong>HTTP is not an adversarial auth layer.</strong> It is a way
+for multiple clients to reach one writer process; non-loopback binds
+require <code>HAI_HTTP_TOKEN</code>.</li>
+</ul>
+<h2 id="quick-start">Quick start</h2>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/smlfg/hai-mcp.git</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> hai-mcp</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> sync <span class="at">--all-extras</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run hai-mcp</span></code></pre></div>
+<p>By default the server speaks stdio MCP.</p>
+<p>Point your MCP client at it, adjusting paths for your machine:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;mcpServers&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;hai&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;command&quot;</span><span class="fu">:</span> <span class="st">&quot;uv&quot;</span><span class="fu">,</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;args&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;run&quot;</span><span class="ot">,</span> <span class="st">&quot;--directory&quot;</span><span class="ot">,</span> <span class="st">&quot;/absolute/path/to/hai-mcp&quot;</span><span class="ot">,</span> <span class="st">&quot;hai-mcp&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;env&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;HAI_HOME&quot;</span><span class="fu">:</span> <span class="st">&quot;/home/you/.hai&quot;</span><span class="fu">,</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;HAI_OWNER_HOME&quot;</span><span class="fu">:</span> <span class="st">&quot;/home/you/.hai-owner&quot;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p>Ready-made examples live in <code>docs/client-snippets/</code>.</p>
+<p>After connecting, call:</p>
+<ul>
+<li><code>hai_health</code> — server, config, owner-gate mode, optional
+project path check</li>
+<li><code>hai_status</code> — active lanes, focus, inbox count, pending
+owner challenges</li>
+<li><code>hai_check_git_hygiene</code> — classify client-reported Git
+dirtiness without running Git</li>
+</ul>
+<h2 id="state-and-paths">State and paths</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Location</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>HAI_HOME</code> (default <code>~/.hai</code>)</td>
+<td>Global control-plane state: active context, inbox, missions, leases,
+audit, checkpoints, skill log</td>
+</tr>
+<tr class="even">
+<td><code>HAI_OWNER_HOME</code> (default <code>~/.hai-owner</code>)</td>
+<td>Owner-channel files for one-time approval codes; must not be inside
+<code>HAI_HOME</code></td>
+</tr>
+<tr class="odd">
+<td><code>&lt;project&gt;/Projek-Managment/</code></td>
+<td>Per-project run-contract artifacts such as <code>NEXT_STEP.md</code>
+and <code>NEXT_STEP.proposed.md</code></td>
+</tr>
+</tbody>
+</table>
+<p>Do not sync <code>HAI_HOME</code> with Dropbox, Syncthing, Git, or
+similar file mirroring. The store contains local paths and
+lock-protected state. Use the HTTP transport or a single writer process
+for multi-client access.</p>
+<h2 id="git-hygiene-gate">Git hygiene gate</h2>
+<p>HAI-MCP can warn or pause new agentic work when a client reports too
+many uncommitted files. The server never shells out to <code>git</code>,
+parses <code>.git</code>, commits, stashes, pushes, or mutates
+repository state. Clients/adapters collect status and pass telemetry as
+<code>git_hygiene={"uncommitted_files": [...]}</code>.</p>
+<p>Environment:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>HAI_GIT_HYGIENE</code></td>
+<td><code>advisory</code></td>
+<td><code>off</code>, <code>advisory</code>, or <code>required</code>.
+Only <code>required</code> blocks.</td>
+</tr>
+<tr class="even">
+<td><code>HAI_GIT_WARN_UNCOMMITTED</code></td>
+<td><code>8</code></td>
+<td>File-count threshold for warning.</td>
+</tr>
+<tr class="odd">
+<td><code>HAI_GIT_PAUSE_UNCOMMITTED</code></td>
+<td><code>15</code></td>
+<td>File-count threshold for pause. Must be greater than warn.</td>
+</tr>
+</tbody>
+</table>
+<p>Behavior:</p>
+<ul>
+<li><code>advisory</code>: telemetry is optional; over-threshold state
+returns <code>status: "warn"</code> or <code>status: "pause"</code> but
+<code>ok: true</code>.</li>
+<li><code>required</code>: missing telemetry returns
+<code>git_hygiene_required</code>; pause threshold without
+<code>override_reason</code> returns <code>git_hygiene_pause</code> and
+blocks <code>hai_open_mission</code> /
+<code>hai_authorize_session</code>.</li>
+<li>Override is explicit: pass <code>override_reason</code> in the
+<code>git_hygiene</code> object. HAI-MCP records the override on the
+contract/session result but still does not touch Git.</li>
+</ul>
+<h2 id="skill-log">Skill log</h2>
+<p>The long-form sibling of <code>manual_practice</code> in
+<code>hai_stop</code>: what the owner can do <em>by hand</em>, and when
+they last did it. The skills needed to verify an agent stay current only
+if they are exercised, so each entry carries a self-assessed level (0-5)
+and a date.</p>
+<p>Currency is derived, never stored:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Status</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>never</code></td>
+<td>level 0 — cannot do it yet, so there is no currency to lose</td>
+</tr>
+<tr class="even">
+<td><code>fresh</code></td>
+<td>practised within <code>HAI_SKILL_FRESH_DAYS</code></td>
+</tr>
+<tr class="odd">
+<td><code>aging</code></td>
+<td>past fresh, still within <code>HAI_SKILL_STALE_DAYS</code></td>
+</tr>
+<tr class="even">
+<td><code>stale</code></td>
+<td>beyond the stale threshold — it decayed</td>
+</tr>
+</tbody>
+</table>
+<p>Environment:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>HAI_SKILL_FRESH_DAYS</code></td>
+<td><code>14</code></td>
+<td>Days a hands-on skill counts as current.</td>
+</tr>
+<tr class="even">
+<td><code>HAI_SKILL_STALE_DAYS</code></td>
+<td><code>30</code></td>
+<td>Days after which it counts as decayed. Must be greater than
+fresh.</td>
+</tr>
+</tbody>
+</table>
+<p>One JSON file per skill under
+<code>HAI_HOME/skills/&lt;skill_id&gt;.json</code>, entries append-only,
+newest first. Skill ids are lowercase dotted labels
+(<code>git.commit</code>, <code>python.debug</code>) and are validated
+before they become filenames. <code>hai_skill_status</code> without
+arguments ranks by actionability: <code>stale</code>,
+<code>aging</code>, <code>never</code>, <code>fresh</code>.</p>
+<p>The log is deliberately inert — it records, it does not enforce.
+Nothing reminds the owner to write to it, and no gate reads from it.</p>
+<h2 id="owner-gate">Owner gate</h2>
+<p>The owner is a separate principal from the agent.</p>
+<p>For owner-gated actions, the default mode is <code>nonce</code>:</p>
+<ol type="1">
+<li>The agent asks for a gated action.</li>
+<li>The server creates a one-time code bound to the exact change.</li>
+<li>The code is delivered to the owner, not to the MCP client.</li>
+<li>The owner relays the code if they approve.</li>
+<li>The agent retries with <code>owner_code</code>.</li>
+<li>The server verifies the code, consumes it, and performs the
+action.</li>
+</ol>
+<p>Supported owner-gate modes:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Mode</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>nonce</code></td>
+<td>Default. One-time code delivered through <code>file</code> or
+<code>ntfy</code>.</td>
+</tr>
+<tr class="even">
+<td><code>presence</code></td>
+<td>Local fingerprint presence check via <code>fprintd-verify</code>.
+Useful only when owner and agent are at the same machine.</td>
+</tr>
+<tr class="odd">
+<td><code>ack_legacy</code></td>
+<td>Compatibility mode. The client asserts <code>owner_ack=true</code>;
+useful for old flows, but not a real owner boundary.</td>
+</tr>
+</tbody>
+</table>
+<p>Details: <code>docs/OWNER_GATE.md</code>.</p>
+<h2 id="tools-v01--29-tools">Tools (v0.1 — 29 tools)</h2>
+<p>Full gate matrix, paths, and error codes:
+<code>docs/TOOL_CONTRACT.md</code>.</p>
+<h3 id="control-plane">Control plane</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Tool</th>
+<th>Role</th>
+<th>Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>hai_health</code></td>
+<td>Check server health and config</td>
+<td>none</td>
+</tr>
+<tr class="even">
+<td><code>hai_status</code></td>
+<td>Show active lanes, focus, inbox, and owner challenges</td>
+<td>none</td>
+</tr>
+<tr class="odd">
+<td><code>hai_check_git_hygiene</code></td>
+<td>Classify client-reported Git dirtiness</td>
+<td>none; read-only; no Git subprocess</td>
+</tr>
+<tr class="even">
+<td><code>hai_check_source_freshness</code></td>
+<td>Classify client-reported source observation age</td>
+<td>none; read-only; does not open or verify sources</td>
+</tr>
+<tr class="odd">
+<td><code>hai_check_retry</code></td>
+<td>Advisory trailing-repeat check for caller telemetry</td>
+<td>none; read-only; never cancels work</td>
+</tr>
+<tr class="even">
+<td><code>hai_get_next_step</code></td>
+<td>Read canonical <code>NEXT_STEP.md</code></td>
+<td>none</td>
+</tr>
+<tr class="odd">
+<td><code>hai_read_artifacts</code></td>
+<td>Read a project run-contract summary</td>
+<td>none</td>
+</tr>
+<tr class="even">
+<td><code>hai_park</code></td>
+<td>Park a thought without stealing the active lane</td>
+<td>none</td>
+</tr>
+<tr class="odd">
+<td><code>hai_set_focus</code></td>
+<td>Set or switch focus</td>
+<td>max 2 active lanes</td>
+</tr>
+<tr class="even">
+<td><code>hai_propose_next_step</code></td>
+<td>Write <code>NEXT_STEP.proposed.md</code></td>
+<td>none</td>
+</tr>
+<tr class="odd">
+<td><code>hai_accept_next_step</code></td>
+<td>Promote proposal to canonical <code>NEXT_STEP.md</code></td>
+<td>owner gate</td>
+</tr>
+<tr class="even">
+<td><code>hai_checkpoint</code></td>
+<td>Snapshot active context, selected artifacts, and optional explicit
+resume context</td>
+<td>none</td>
+</tr>
+<tr class="odd">
+<td><code>hai_recover</code></td>
+<td>Return the smallest recovery action plus a bounded recorded resume
+packet</td>
+<td>none</td>
+</tr>
+</tbody>
+</table>
+<h3 id="mission-engine">Mission engine</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Tool</th>
+<th>Role</th>
+<th>Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>hai_open_mission</code></td>
+<td>Open one bounded mission with a versioned contract</td>
+<td>valid finite contract; no second active mission; optional Git
+hygiene gate</td>
+</tr>
+<tr class="even">
+<td><code>hai_authorize_session</code></td>
+<td>Grant a time-bounded session lease on a contract version</td>
+<td>active mission; current contract; capacity; optional Git hygiene
+gate</td>
+</tr>
+<tr class="odd">
+<td><code>hai_bind_project</code></td>
+<td>Bind a logical project id to a device-local mount</td>
+<td>owner acknowledgement; see tool contract</td>
+</tr>
+<tr class="even">
+<td><code>hai_get_contract</code></td>
+<td>Return the exact canonical contract for a valid lease</td>
+<td>valid non-expired lease</td>
+</tr>
+<tr class="odd">
+<td><code>hai_check_activity</code></td>
+<td>Classify planned or observed activity against the contract</td>
+<td>valid session lease</td>
+</tr>
+<tr class="even">
+<td><code>hai_park_item</code></td>
+<td>Park a mission-linked idea with context</td>
+<td>rationale required; no execution right</td>
+</tr>
+<tr class="odd">
+<td><code>hai_recontract</code></td>
+<td>Apply a visible contract diff and revoke old leases</td>
+<td>owner gate</td>
+</tr>
+<tr class="even">
+<td><code>hai_close_mission</code></td>
+<td>Complete with evidence or abandon with owner approval</td>
+<td>evidence per criterion, or owner gate for abandon</td>
+</tr>
+</tbody>
+</table>
+<h3 id="daily-flow-wrappers">Daily flow wrappers</h3>
+<p>These are thin surfaces over the same state engine. They do not
+create a second truth.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Tool</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>hai_intake</code></td>
+<td>Capture a raw thought immutably; returns an intake id only</td>
+</tr>
+<tr class="even">
+<td><code>hai_distill</code></td>
+<td>Store exactly one decision and one next step; park the rest</td>
+</tr>
+<tr class="odd">
+<td><code>hai_mission_start</code></td>
+<td>Fast-start wrapper over <code>hai_open_mission</code>; accepts
+optional Git hygiene telemetry</td>
+</tr>
+<tr class="even">
+<td><code>hai_drift_check</code></td>
+<td>Lightweight wrapper over <code>hai_check_activity</code></td>
+</tr>
+<tr class="odd">
+<td><code>hai_proof</code></td>
+<td>Completion wrapper over <code>hai_close_mission</code></td>
+</tr>
+<tr class="even">
+<td><code>hai_stop</code></td>
+<td>Hard day terminal; records closure answers and revokes leases
+without auto-closing missions</td>
+</tr>
+</tbody>
+</table>
+<h3 id="skill-log-1">Skill log</h3>
+<p>Standalone and side-effect free: no other tool reads this log, and it
+never blocks anything.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Tool</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>hai_skill_log</code></td>
+<td>Record that the owner exercised a skill by hand (level 0-5 +
+evidence)</td>
+</tr>
+<tr class="even">
+<td><code>hai_skill_status</code></td>
+<td>Read one skill with history, or all skills ranked by decay</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tool-annotations">Tool annotations</h3>
+<p>The MCP tool listing includes machine-readable tool annotations:</p>
+<ul>
+<li><code>readOnlyHint</code></li>
+<li><code>destructiveHint</code></li>
+<li><code>idempotentHint</code></li>
+<li><code>openWorldHint</code></li>
+</ul>
+<p>These help clients and reviewers understand expected tool behavior
+without guessing from prose. They are disclosure metadata; runtime
+authority is still enforced by the server, the owner gate, and path
+confinement.</p>
+<h2 id="transport">Transport</h2>
+<p>Default transport is stdio:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run hai-mcp</span></code></pre></div>
+<p>Optional streamable HTTP is available for trusted local multi-client
+access:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run hai-mcp <span class="at">--transport</span> streamable-http <span class="at">--host</span> 127.0.0.1 <span class="at">--port</span> 8765</span></code></pre></div>
+<p>Non-loopback HTTP binds require <code>HAI_HTTP_TOKEN</code>. The HTTP
+transport is not an adversarial owner-authentication layer; it is a way
+for clients to talk to one writer process.</p>
+<h2 id="architecture">Architecture</h2>
+<pre class="mermaid"><code>flowchart LR
+  subgraph Clients
+    Cursor
+    Claude[Claude Code]
+    Codex
+    Hermes
+    Other[Other MCP clients]
+  end
+
+  subgraph Server[hai-mcp]
+    MCP[FastMCP stdio / streamable-http]
+    CP[ControlPlane]
+    ME[MissionEngine]
+    OG[OwnerGate]
+    MCP --&gt; CP
+    CP --&gt; ME
+    CP --&gt; OG
+  end
+
+  subgraph State[Confined local state]
+    HAIHOME[HAI_HOME]
+    OWNERHOME[HAI_OWNER_HOME]
+    PROJECT[project/Projek-Managment]
+  end
+
+  Clients --&gt; MCP
+  CP --&gt; HAIHOME
+  OG --&gt; OWNERHOME
+  CP --&gt; PROJECT
+  ME --&gt; HAIHOME</code></pre>
+<p><img src="docs/visuals/hai-mcp-mission-lifecycle.svg"
+alt="HAI-MCP mission lifecycle" /></p>
+<p>Source layout:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Path</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>src/hai_mcp/server.py</code></td>
+<td>MCP tool registration and transport entry point</td>
+</tr>
+<tr class="even">
+<td><code>src/hai_mcp/state.py</code></td>
+<td>Control-plane operations and daily flow tools</td>
+</tr>
+<tr class="odd">
+<td><code>src/hai_mcp/mission.py</code></td>
+<td>Mission contracts, leases, activity policy, closure</td>
+</tr>
+<tr class="even">
+<td><code>src/hai_mcp/owner_gate.py</code></td>
+<td>Nonce, presence, and legacy owner-gate modes</td>
+</tr>
+<tr class="odd">
+<td><code>src/hai_mcp/paths.py</code></td>
+<td>Root confinement and symlink-safe path handling</td>
+</tr>
+<tr class="even">
+<td><code>src/hai_mcp/projects.py</code></td>
+<td>Logical project ids and device mounts</td>
+</tr>
+</tbody>
+</table>
+<h2 id="tests">Tests</h2>
+<p>Use an isolated <code>HAI_HOME</code> when running experiments or
+tests.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> sync <span class="at">--all-extras</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run pytest</span></code></pre></div>
+<h2 id="documentation">Documentation</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Document</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>GOAL.md</code></td>
+<td>Current slice goal and active boundaries</td>
+</tr>
+<tr class="even">
+<td><code>docs/TOOL_CONTRACT.md</code></td>
+<td>Tool mutation/gate matrix, paths, artifact names, errors</td>
+</tr>
+<tr class="odd">
+<td><code>docs/OWNER_GATE.md</code></td>
+<td>Owner-gate design and modes</td>
+</tr>
+<tr class="even">
+<td><code>docs/client-snippets/</code></td>
+<td>MCP client config examples</td>
+</tr>
+<tr class="odd">
+<td><code>docs/BUILD_HANDOFF.md</code></td>
+<td>Build handoff and verification history</td>
+</tr>
+<tr class="even">
+<td><code>docs/wireframes/2026-07-22-mission-contract-lifecycle/</code></td>
+<td>Mission lifecycle state and UX model</td>
+</tr>
+<tr class="odd">
+<td><code>AGENTS.md</code></td>
+<td>Contributor rules for agents working in this repo</td>
+</tr>
+</tbody>
+</table>
+<h2 id="legacy">Legacy</h2>
+<p><code>~/.config/hai-agent-mcp</code> is Hermes-coupled prior art.
+This repo replaces that role for control-plane work. Coexistence is fine
+until you switch clients deliberately.</p>
+</main>
+<script type="module">import m from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+m.initialize({startOnLoad:false,theme:matchMedia("(prefers-color-scheme: dark)").matches?"dark":"default"});
+document.querySelectorAll("pre.mermaid code").forEach(c=>{c.parentElement.textContent=c.textContent});
+await m.run({querySelector:"pre.mermaid",suppressErrors:true});</script></body></html>

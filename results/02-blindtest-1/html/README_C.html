@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>README C</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>body{max-width:860px;margin:2rem auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;color:#1f2328;background:#fff}
+  @media (prefers-color-scheme:dark){body{color:#e6edf3;background:#0d1117}a{color:#58a6ff}table,th,td{border-color:#30363d}code,pre{background:#161b22}}
+  table{border-collapse:collapse}th,td{border:1px solid #d0d7de;padding:4px 10px}code,pre{background:#f6f8fa;border-radius:4px}pre{padding:12px;overflow:auto}
+  .badge{position:fixed;top:8px;right:12px;font:700 28px system-ui;opacity:.35}</style>
+</head>
+<body><div class="badge">C</div>
+<header id="title-block-header">
+<h1 class="title">README C</h1>
+</header>
+<h1 id="make-all-repos-public">make-all-repos-public</h1>
+<blockquote>
+<p>~200 Projekte in einem Jahr gebaut, kaum etwas davon auf GitHub. In
+einer Nacht mit Agenten nachgeholt, und dabei gemessen, wie ehrlich
+verschiedene LLMs über fremden Code schreiben.</p>
+</blockquote>
+<p><strong>Status:</strong> lokal, nicht veröffentlicht. Rohdaten mit
+privaten Repo-Namen liegen in <code>data/private/</code> (per
+<code>.gitignore</code> nie in der Historie).</p>
+<h2 id="schnellstart">Schnellstart</h2>
+<ol type="1">
+<li><a href="ANALYSE.md"><code>ANALYSE.md</code></a> —
+Benchmark-Ergebnisse aller 9 Modelle (gleicher Auftrag, 5 Repos,
+gemessen maschinell).</li>
+<li><a href="skill/SKILL.md"><code>skill/SKILL.md</code></a> — Der
+Publish-/Polish-Skill des hai-agent (Lizenz, Topics, gitleaks, Worktree,
+Default-Branch).</li>
+<li><a href="scripts/publish.sh"><code>scripts/publish.sh</code></a> —
+Erster Einstieg: Repo auf GitHub anlegen, pushen, Remote-HEAD
+prüfen.</li>
+<li><a href="scripts/grounding.py"><code>scripts/grounding.py</code></a>
+— Pfad-Treue: Existenz der in READMEs genannten Pfade deterministisch
+prüfen.</li>
+<li><a href="FOR_SMLFLG.md"><code>FOR_SMLFLG.md</code></a> —
+Entscheidungen, Lessons Learned, offene Fragen.</li>
+</ol>
+<h2 id="struktur">Struktur</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Pfad</th>
+<th>Inhalt</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>scripts/publish.sh</code>, <code>run-publish.sh</code></td>
+<td>Repo auf GitHub anlegen, pushen, Remote-HEAD gegen lokal prüfen</td>
+</tr>
+<tr class="even">
+<td><code>scripts/push-all.sh</code></td>
+<td>Nachträgliche Commits pushen, mit Abgleich</td>
+</tr>
+<tr class="odd">
+<td><code>scripts/polish-one.sh</code></td>
+<td>Eine hai-agent-Session pro Repo, nur <code>README.md</code>,
+Scope-Guard</td>
+</tr>
+<tr class="even">
+<td><code>scripts/repair-one.sh</code></td>
+<td>Nachbesserung: Agent bekommt die Liste erfundener Pfade</td>
+</tr>
+<tr class="odd">
+<td><code>scripts/h2h-one.sh</code>, <code>oc-one.sh</code></td>
+<td>Head-to-head in Hermes bzw. OpenCode-Harness</td>
+</tr>
+<tr class="even">
+<td><code>scripts/grounding.py</code></td>
+<td>Pfad-Treue: existieren die Pfade, die die README nennt?</td>
+</tr>
+<tr class="odd">
+<td><code>scripts/eval-readme.py</code>, <code>eval3.py</code></td>
+<td>Aggregat-Eval pro Modell, Repair vorher/nachher</td>
+</tr>
+<tr class="even">
+<td><code>scripts/analyse.py</code></td>
+<td>Benchmark-Tabelle aus Rohdaten generieren</td>
+</tr>
+<tr class="odd">
+<td><code>skill/SKILL.md</code></td>
+<td>Publish-/Polish-Skill des hai-agent (erweitert um Lizenz, Topics,
+gitleaks, Worktree, Default-Branch)</td>
+</tr>
+<tr class="even">
+<td><code>ANALYSE.md</code></td>
+<td>Benchmark-Ergebnisse: 9 Modelle, 5 Repos, gleicher Auftrag</td>
+</tr>
+<tr class="odd">
+<td><code>data/private/</code></td>
+<td>Rohlogs, Queues, Leak-Reports (per <code>.gitignore</code>
+ignoriert)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="ablauf">Ablauf</h2>
+<p><strong>Pipeline:</strong> lokale Git-Repos inventarisieren →
+Secret-Scan über die ganze Historie (<code>gitleaks</code>) → als
+private GitHub-Repos anlegen → Lizenz + Topics → README-Polish durch
+einen Agenten → deterministische Abnahme (<code>grounding.py</code>) →
+Commit/Push.</p>
+<p><strong>Benchmark:</strong> <em>same task, same harness, different
+model.</em> Derselbe README-Auftrag, dieselben Repos, verschiedene
+Modelle. Messung via <code>scripts/analyse.py</code>. Ergebnisse: <a
+href="ANALYSE.md"><code>ANALYSE.md</code></a>.</p>
+<h2 id="grenzen">Grenzen</h2>
+<ul>
+<li>Skripte enthalten hartkodierte lokale Pfade und sind vor einer
+Veröffentlichung zu entpersonalisieren.</li>
+<li>Benchmark mit 5 Repos und einer Auswahl, die GPT begünstigt (siehe
+<code>ANALYSE.md</code>, Abschnitt Vorbehalte).</li>
+<li>Secret-Scan mit gitleaks ist notwendig, nicht hinreichend.</li>
+<li><code>data/private/</code> bleibt per <code>.gitignore</code> immer
+ausgeschlossen — private Repo-Namen nie in der Historie.</li>
+<li>Kein Secret, kein API-Key, kein privater Pfad in diesem Repo.</li>
+</ul>
+<h2 id="herkunft">Herkunft</h2>
+<p>Entstanden in der Nacht 22./23.09.2026 aus einer einzigen Session im
+Workspace <code>_contest-marp-20260923/entries/</code>. Samuel
+entschied, Claude orchestrierte, hai-agent und andere Modelle schrieben.
+Aus dem übergeordneten Workspace extrahiert, mit eigener
+<code>.gitignore</code> und <code>LICENSE</code>.</p>
+<h2 id="benchmark">Benchmark</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Arm</th>
+<th>Treue</th>
+<th>Dichte</th>
+<th>Abschnitte</th>
+<th>Zeilen</th>
+<th>Dauer</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>gpt-5.5 (hermes)</td>
+<td>92 %</td>
+<td>2.8</td>
+<td>4.0/4</td>
+<td>43</td>
+<td>123 s</td>
+</tr>
+<tr class="even">
+<td>nemotron-3-ultra-free (opencode)</td>
+<td>91 %</td>
+<td>2.5</td>
+<td>4.0/4</td>
+<td>48</td>
+<td>81 s</td>
+</tr>
+<tr class="odd">
+<td>deepseek-v4.1-flash (hermes)</td>
+<td>90 %</td>
+<td>2.5</td>
+<td>4.0/4</td>
+<td>60</td>
+<td>108 s</td>
+</tr>
+<tr class="even">
+<td><strong>ling-3.0-flash-fin-free (opencode)</strong></td>
+<td><strong>90 %</strong></td>
+<td><strong>2.7</strong></td>
+<td><strong>4.0/4</strong></td>
+<td><strong>48</strong></td>
+<td><strong>25 s</strong></td>
+</tr>
+<tr class="odd">
+<td>muse-spark-1.2-contributor-free (opencode)</td>
+<td>90 %</td>
+<td>2.8</td>
+<td>4.0/4</td>
+<td>57</td>
+<td>66 s</td>
+</tr>
+<tr class="even">
+<td>nemotron-3.5-lightning-free (opencode)</td>
+<td>89 %</td>
+<td>2.1</td>
+<td>4.0/4</td>
+<td>38</td>
+<td>292 s</td>
+</tr>
+<tr class="odd">
+<td>muse-spark-1.3-contributor-free (opencode)</td>
+<td>86 %</td>
+<td>2.1</td>
+<td>4.0/4</td>
+<td>51</td>
+<td>52 s</td>
+</tr>
+<tr class="even">
+<td>mimo-v2.6-flash-free (opencode)</td>
+<td>83 %</td>
+<td>2.3</td>
+<td>4.0/4</td>
+<td>58</td>
+<td>88 s</td>
+</tr>
+<tr class="odd">
+<td>MiniMax-M3 (hermes)</td>
+<td>80 %</td>
+<td>1.2</td>
+<td>3.8/4</td>
+<td>83</td>
+<td>39 s</td>
+</tr>
+</tbody>
+</table>
+<p>Siehe <code>ANALYSE.md</code> für Details, Vorbehalte und
+Reproduktion.</p>
+</body>
+</html>

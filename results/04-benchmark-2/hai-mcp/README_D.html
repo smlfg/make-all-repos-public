@@ -1,0 +1,320 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>README D</title><base href="D/"><style>:root{--bg:#fcfcfb;--fg:#0b0b0b;--muted:#52514e;--line:#d0d7de;--code:#f0efec;--link:#2a78d6}
+@media (prefers-color-scheme:dark){:root{--bg:#1a1a19;--fg:#f2f1ee;--muted:#c3c2b7;--line:#383835;--code:#262624;--link:#6da7ec}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px}a{color:var(--link)}
+h1,h2,h3{line-height:1.25}h1{border-bottom:1px solid var(--line);padding-bottom:.3em}
+table{border-collapse:collapse;display:block;overflow-x:auto}th,td{border:1px solid var(--line);padding:4px 10px;text-align:left}
+code{background:var(--code);color:var(--fg);padding:.1em .3em;border-radius:4px;font-size:.92em}
+pre{background:var(--code);color:var(--fg);padding:12px;border-radius:6px;overflow-x:auto}pre code{padding:0;background:none}
+pre.mermaid{background:transparent;text-align:center}img{max-width:100%}blockquote{border-left:3px solid var(--line);margin:0;padding-left:12px;color:var(--muted)}
+.badge{position:fixed;top:8px;right:12px;font:700 32px system-ui;color:var(--muted);opacity:.6}</style></head><body><div class="badge">D</div><main><h1 id="hai-mcp">HAI-MCP</h1>
+<p><strong>HAI-MCP is the open-source MCP control-plane implementation
+of Human Agent Interface (HAI), created by Samuel Fleig.</strong></p>
+<p>It gives AI coding clients a shared, durable contract for agentic
+work: what is in scope, which session may act, what must be parked, and
+what counts as done. The server is model-agnostic: Claude Code, Cursor,
+Codex, Grok, OpenCode, Hermes, and any other MCP client can call the
+same tools.</p>
+<p>The server itself never calls an LLM.</p>
+<ul>
+<li>Canonical website: <a
+href="https://www.human-agent-interface.com/">https://www.human-agent-interface.com/</a></li>
+<li>About Samuel Fleig: <a
+href="https://www.human-agent-interface.com/samuel/">https://www.human-agent-interface.com/samuel/</a></li>
+<li>Package: <code>hai-mcp</code> v0.1.0, Python 3.12+, MCP SDK
+<code>&lt;2</code></li>
+</ul>
+<h2 id="quick-start">Quick start</h2>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/smlfg/hai-mcp.git</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> hai-mcp</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> sync <span class="at">--all-extras</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run hai-mcp</span></code></pre></div>
+<p>By default the server speaks stdio MCP.</p>
+<p>Point your MCP client at it, adjusting paths for your machine:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;mcpServers&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;hai&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;command&quot;</span><span class="fu">:</span> <span class="st">&quot;uv&quot;</span><span class="fu">,</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;args&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;run&quot;</span><span class="ot">,</span> <span class="st">&quot;--directory&quot;</span><span class="ot">,</span> <span class="st">&quot;/absolute/path/to/hai-mcp&quot;</span><span class="ot">,</span> <span class="st">&quot;hai-mcp&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;env&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;HAI_HOME&quot;</span><span class="fu">:</span> <span class="st">&quot;/home/you/.hai&quot;</span><span class="fu">,</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;HAI_OWNER_HOME&quot;</span><span class="fu">:</span> <span class="st">&quot;/home/you/.hai-owner&quot;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p>Ready-made examples live in <code>docs/client-snippets/</code>.</p>
+<p>After connecting, call:</p>
+<ul>
+<li><code>hai_health</code> — server, config, owner-gate mode, optional
+project path check</li>
+<li><code>hai_status</code> — active lanes, focus, inbox count, pending
+owner challenges</li>
+<li><code>hai_check_git_hygiene</code> — classify client-reported Git
+dirtiness without running Git</li>
+</ul>
+<h2 id="repository-structure">Repository structure</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Path</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>src/hai_mcp/</code></td>
+<td>Server + control-plane logic</td>
+</tr>
+<tr class="even">
+<td><code>tests/</code></td>
+<td>Unit + gate tests</td>
+</tr>
+<tr class="odd">
+<td><code>docs/client-snippets/</code></td>
+<td>MCP client config examples</td>
+</tr>
+<tr class="even">
+<td><code>docs/TOOL_CONTRACT.md</code></td>
+<td>Tool mutation/gate matrix, paths, artifact names, errors</td>
+</tr>
+<tr class="odd">
+<td><code>docs/OWNER_GATE.md</code></td>
+<td>Owner-gate design and modes</td>
+</tr>
+<tr class="even">
+<td><code>docs/BUILD_HANDOFF.md</code></td>
+<td>Build handoff and verification history</td>
+</tr>
+<tr class="odd">
+<td><code>docs/visuals/</code></td>
+<td>Architecture and lifecycle diagrams (SVG + PNG)</td>
+</tr>
+<tr class="even">
+<td><code>docs/wireframes/</code></td>
+<td>Mission lifecycle UX model</td>
+</tr>
+<tr class="odd">
+<td><code>GOAL.md</code></td>
+<td>Current slice goal and active boundaries</td>
+</tr>
+<tr class="even">
+<td><code>FOR_SMLFLG.md</code></td>
+<td>Architecture, decisions, lessons-learned for this repo</td>
+</tr>
+<tr class="odd">
+<td><code>AGENTS.md</code></td>
+<td>Contributor rules for agents working in this repo</td>
+</tr>
+</tbody>
+</table>
+<h2 id="state-and-paths">State and paths</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Location</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>HAI_HOME</code> (default <code>~/.hai</code>)</td>
+<td>Global control-plane state: active context, inbox, missions, leases,
+audit, checkpoints, skill log</td>
+</tr>
+<tr class="even">
+<td><code>HAI_OWNER_HOME</code> (default <code>~/.hai-owner</code>)</td>
+<td>Owner-channel files for one-time approval codes; must not be inside
+<code>HAI_HOME</code></td>
+</tr>
+<tr class="odd">
+<td><code>&lt;project&gt;/Projek-Managment/</code></td>
+<td>Per-project run-contract artifacts such as <code>NEXT_STEP.md</code>
+and <code>NEXT_STEP.proposed.md</code></td>
+</tr>
+</tbody>
+</table>
+<p>Do not sync <code>HAI_HOME</code> with Dropbox, Syncthing, Git, or
+similar file mirroring. The store contains local paths and
+lock-protected state. Use the HTTP transport or a single writer process
+for multi-client access.</p>
+<h2 id="workflow--safety-boundaries">Workflow &amp; safety
+boundaries</h2>
+<p><strong>What HAI-MCP is not:</strong></p>
+<ul>
+<li>an LLM or agent runtime</li>
+<li>a harness executor</li>
+<li>an OS sandbox or adversarial security layer</li>
+<li>a semantic verifier for whether the model "really understood" the
+goal</li>
+<li>a commit, push, deploy, or delete tool</li>
+<li>a cloud sync system for <code>HAI_HOME</code></li>
+</ul>
+<p>Its job is the contract layer: explicit scope, explicit leases,
+explicit gates, explicit evidence.</p>
+<p><strong>Git hygiene gate</strong> — The server never shells out to
+<code>git</code>, parses <code>.git</code>, commits, stashes, pushes, or
+mutates repository state. Clients/adapters collect status and pass
+telemetry as <code>git_hygiene={"uncommitted_files": [...]}</code>.
+Modes: <code>off</code>, <code>advisory</code>, <code>required</code>
+(blocks on pause threshold). See <code>docs/TOOL_CONTRACT.md</code> for
+full matrix.</p>
+<p><strong>Owner gate</strong> — The owner is a separate principal from
+the agent. Default mode is <code>nonce</code>: one-time code delivered
+through <code>file</code> or <code>ntfy</code>, verified by server,
+consumed on use. Alternative modes: <code>presence</code> (local
+fingerprint via <code>fprintd-verify</code>), <code>ack_legacy</code>
+(compatibility, not a real owner boundary). Details:
+<code>docs/OWNER_GATE.md</code>.</p>
+<p><strong>Fail-closed defaults</strong> — All gates default to
+blocking. No LLM calls inside the server. Path confinement via
+<code>src/hai_mcp/paths.py</code>. No secrets in configs.</p>
+<h2 id="architecture">Architecture</h2>
+<pre class="mermaid"><code>flowchart LR
+  subgraph Clients
+    Cursor
+    Claude[Claude Code]
+    Codex
+    Hermes
+    Other[Other MCP clients]
+  end
+
+  subgraph Server[hai-mcp]
+    MCP[FastMCP stdio / streamable-http]
+    CP[ControlPlane]
+    ME[MissionEngine]
+    OG[OwnerGate]
+    MCP --&gt; CP
+    CP --&gt; ME
+    CP --&gt; OG
+  end
+
+  subgraph State[Confined local state]
+    HAIHOME[HAI_HOME]
+    OWNERHOME[HAI_OWNER_HOME]
+    PROJECT[project/Projek-Managment]
+  end
+
+  Clients --&gt; MCP
+  CP --&gt; HAIHOME
+  OG --&gt; OWNERHOME
+  CP --&gt; PROJECT
+  ME --&gt; HAIHOME</code></pre>
+<p>Source layout:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Path</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>src/hai_mcp/server.py</code></td>
+<td>MCP tool registration and transport entry point</td>
+</tr>
+<tr class="even">
+<td><code>src/hai_mcp/state.py</code></td>
+<td>Control-plane operations and daily flow tools</td>
+</tr>
+<tr class="odd">
+<td><code>src/hai_mcp/mission.py</code></td>
+<td>Mission contracts, leases, activity policy, closure</td>
+</tr>
+<tr class="even">
+<td><code>src/hai_mcp/owner_gate.py</code></td>
+<td>Nonce, presence, and legacy owner-gate modes</td>
+</tr>
+<tr class="odd">
+<td><code>src/hai_mcp/paths.py</code></td>
+<td>Root confinement and symlink-safe path handling</td>
+</tr>
+<tr class="even">
+<td><code>src/hai_mcp/projects.py</code></td>
+<td>Logical project ids and device mounts</td>
+</tr>
+</tbody>
+</table>
+<h2 id="visual-assets">Visual assets</h2>
+<ul>
+<li><code>docs/visuals/hai-mcp-mission-lifecycle.svg</code> — Mission
+lifecycle state machine</li>
+<li><code>docs/visuals/hai-mcp-mission-lifecycle.png</code> — PNG
+fallback for the lifecycle diagram</li>
+</ul>
+<p>Full diagram gallery: <code>docs/DIAGRAMS.md</code> (to be
+created).</p>
+<h2 id="transport">Transport</h2>
+<p>Default transport is stdio:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run hai-mcp</span></code></pre></div>
+<p>Optional streamable HTTP for trusted local multi-client access:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run hai-mcp <span class="at">--transport</span> streamable-http <span class="at">--host</span> 127.0.0.1 <span class="at">--port</span> 8765</span></code></pre></div>
+<p>Non-loopback HTTP binds require <code>HAI_HTTP_TOKEN</code>. The HTTP
+transport is not an adversarial owner-authentication layer; it is a way
+for clients to talk to one writer process.</p>
+<h2 id="tests">Tests</h2>
+<p>Use an isolated <code>HAI_HOME</code> when running experiments or
+tests.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> sync <span class="at">--all-extras</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run pytest</span></code></pre></div>
+<h2 id="documentation">Documentation</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Document</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>GOAL.md</code></td>
+<td>Current slice goal and active boundaries</td>
+</tr>
+<tr class="even">
+<td><code>docs/TOOL_CONTRACT.md</code></td>
+<td>Tool mutation/gate matrix, paths, artifact names, errors</td>
+</tr>
+<tr class="odd">
+<td><code>docs/OWNER_GATE.md</code></td>
+<td>Owner-gate design and modes</td>
+</tr>
+<tr class="even">
+<td><code>docs/client-snippets/</code></td>
+<td>MCP client config examples</td>
+</tr>
+<tr class="odd">
+<td><code>docs/BUILD_HANDOFF.md</code></td>
+<td>Build handoff and verification history</td>
+</tr>
+<tr class="even">
+<td><code>docs/wireframes/2026-07-22-mission-contract-lifecycle/</code></td>
+<td>Mission lifecycle state and UX model</td>
+</tr>
+<tr class="odd">
+<td><code>AGENTS.md</code></td>
+<td>Contributor rules for agents working in this repo</td>
+</tr>
+</tbody>
+</table>
+<h2 id="legacy">Legacy</h2>
+<p><code>~/.config/hai-agent-mcp</code> is Hermes-coupled prior art.
+This repo replaces that role for control-plane work. Coexistence is fine
+until you switch clients deliberately.</p>
+<h2 id="lineage">Lineage</h2>
+<p>This repository was extracted from the <code>hai-sidecar</code>
+workspace (Sidecar V8 evolution) as a standalone MCP control-plane
+server. The <code>docs/plans/</code> directory retains the hardening
+slices (fail-closed, flow-tools) that led to the current architecture.
+See <code>docs/plans/2026-07-22-failclosed-hardening-SLICE.md</code> and
+related plans for the decision trail.</p>
+</main>
+<script type="module">import m from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+m.initialize({startOnLoad:false,theme:matchMedia("(prefers-color-scheme: dark)").matches?"dark":"default"});
+document.querySelectorAll("pre.mermaid code").forEach(c=>{c.parentElement.textContent=c.textContent});
+await m.run({querySelector:"pre.mermaid",suppressErrors:true});</script></body></html>
