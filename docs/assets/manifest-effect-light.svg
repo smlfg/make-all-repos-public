@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="650.592pt" height="306.680547pt" viewBox="0 0 650.592 306.680547" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-09-23T16:12:42.107297</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.9, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 306.680547 
+L 650.592 306.680547 
+L 650.592 0 
+L 0 0 
+z
+" style="fill: #fcfcfb"/>
+  </g>
+  <g id="axes_1">
+   <g id="text_1">
+    <text style="font-size: 15px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #52514e" x="162.36878" y="79.906103" transform="rotate(-0 162.36878 79.906103)">Pfad-Treue</text>
+   </g>
+   <g id="text_2">
+    <text style="font-weight: 700; font-size: 30px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #52514e" x="69.267512" y="162.790125" transform="rotate(-0 69.267512 162.790125)">61 %</text>
+   </g>
+   <g id="patch_2">
+    <path d="M 117.82121 154.512 
+Q 154.613133 154.512 189.392595 154.512 
+" style="fill: none; stroke: #52514e; stroke-width: 1.8; stroke-linecap: round"/>
+    <path d="M 185.392595 152.512 
+L 189.392595 154.512 
+L 185.392595 156.512 
+z
+" style="fill: #52514e; stroke: #52514e; stroke-width: 1.8; stroke-linecap: round"/>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 40px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #2a78d6" x="261.6768" y="165.5495" transform="rotate(-0 261.6768 165.5495)">100 %</text>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="text_4">
+    <text style="font-size: 15px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #52514e" x="488.22322" y="79.906103" transform="rotate(-0 488.22322 79.906103)">neu erfundene Pfade</text>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 30px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #52514e" x="395.121951" y="162.790125" transform="rotate(-0 395.121951 162.790125)">28</text>
+   </g>
+   <g id="patch_3">
+    <path d="M 443.675649 154.512 
+Q 480.467572 154.512 515.247034 154.512 
+" style="fill: none; stroke: #52514e; stroke-width: 1.8; stroke-linecap: round"/>
+    <path d="M 511.247034 152.512 
+L 515.247034 154.512 
+L 511.247034 156.512 
+z
+" style="fill: #52514e; stroke: #52514e; stroke-width: 1.8; stroke-linecap: round"/>
+   </g>
+   <g id="text_6">
+    <text style="font-weight: 700; font-size: 40px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #eb6834" x="587.531239" y="165.5495" transform="rotate(-0 587.531239 165.5495)">0</text>
+   </g>
+  </g>
+  <g id="text_7">
+   <text style="font-weight: 700; font-size: 16px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #0b0b0b" x="325.296" y="19.3575" transform="rotate(-0 325.296 19.3575)">Datei-Manifest im Prompt hebt die Pfad-Treue</text>
+  </g>
+  <g id="text_8">
+   <text style="font-size: 10px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; text-anchor: middle; fill: #52514e" x="325.296" y="39.745375" transform="rotate(-0 325.296 39.745375)">Gleiches Modell (deepseek-v4.1-flash), gleiche 16 Repos, gleicher Prüfer — einzige Änderung: Dateiliste im Prompt</text>
+  </g>
+  <g id="text_9">
+   <text style="font-size: 8.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #52514e" transform="translate(139.20975 288.194672)">Vorher-Wert: Reparatur ohne Dateiliste (61 %, 28 neu erfunden). Messung: Anteil der in</text>
+   <text style="font-size: 8.5px; font-family: 'DejaVu Sans', 'Bitstream Vera Sans', 'Computer Modern Sans Serif', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', sans-serif; fill: #52514e" transform="translate(216.001938 297.712812)">Backticks genannten Pfade, die im Repo existieren.</text>
+  </g>
+ </g>
+</svg>
